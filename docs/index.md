@@ -10,6 +10,19 @@ with custom configuration.
 
 ## Usage
 
+### Renovate config file
+
+The renovate config is expected at `.github/renovate.json5`.
+
+### Custom containers
+
+Custom containers may be required if you are using the input
+`post-upgrade-command`. The container needs to have renovate image as base and
+additional tools available in path. The Dockerfile for the custom container is
+expected at `devtools/renovate.Dockerfile`. If this file exists, it is used. If
+this file does not exist, the latest version of the default renovate image is
+used.
+
 ### Inputs
 
 ```yaml
