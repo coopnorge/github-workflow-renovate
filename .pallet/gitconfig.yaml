@@ -9,6 +9,7 @@ spec:
   description: Reusable GitHub workflow for renovate bot
   actions:
     enableReusableWorkflowsForOrganizationAccess: true
+  visibility: public
   branches:
     default: main
     protection:
