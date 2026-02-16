@@ -1,13 +1,12 @@
 # github-workflow-renovate
 
-This is an example documentation for the example workflow. For a real example,
-see
-[the README of github-workflow-terraform-validation](https://github.com/coopnorge/github-workflow-terraform-validation/blob/main/README.md).
+Reusable workflow for renovate. Uses
+[official renovate GitHub action](https://github.com/renovatebot/github-action)
+with custom configuration.
 
 ## Goals
 
-* Demonstrate how an example workflow looks like.
-* Demonstrate how to access inputs and secrets in a reusable workflow.
+- Have a ready-to-use reusable action to run renovate.
 
 ## Usage
 
@@ -15,45 +14,41 @@ see
 
 ```yaml
 inputs:
-  example-string-input:
+  post-upgrade-command:
     type: string
-    default: example-string-input
-    required: true
-    description: |
-      Description of the example string input.
-  example-number-input:
-    type: number
-    default: 42
     required: false
     description: |
-      Example number input.
-  example-boolean-input:
-    type: boolean
-    default: false
+      Command to run after upgrade.
+  config-file:
+    type: string
+    default: .github/renovate.json5
     required: false
     description: |
-      Description of the example boolean input.
-
-secrets:
-  example-secret:
-    required: false
-    description: |
-      Example secret.
+      Configuration file to use.
 ```
 
 This job can be added to your workflow as follows:
 
 ```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Override default log level"
+        required: false
+        default: "debug"
+        type: string
+
+  schedule:
+    - cron: "0 4 * * *"
+
 jobs:
-  # <some other jobs>
-  example-ci:
-    name: "Example CI"
+  renovate:
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      issues: write
     uses: coopnorge/github-workflow-renovate/.github/workflows/renovate.yaml@v0
-    with:
-      example-string-input: Example string
-      example-number-input: 12
-      example-boolean-input: true
-    secrets:
-      example-secret: ${{ secrets.EXAMPLE_SECRET }}
-  # <some other jobs>
+    secrets: inherit
 ```

@@ -1,38 +1,95 @@
 on:
   workflow_call:
     inputs:
-      example-string-input:
+      post-upgrade-command:
         type: string
-        default: example-string-input
-        required: true
-        description: |
-          Description of the example string input.
-      example-number-input:
-        type: number
-        default: 42
         required: false
         description: |
-          Example number input.
-      example-boolean-input:
-        type: boolean
-        default: false
+          Command to run after upgrade.
+      config-file:
+        type: string
+        default: .github/renovate.json5
         required: false
         description: |
-          Description of the example boolean input.
-
-    secrets:
-      example-secret:
-        required: false
-        description: |
-          Example secret.
+          Configuration file to use.
+    secrets: {}
 
 jobs:
-  show-inputs:
+  renovate:
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      issues: write
     runs-on: ubuntu-latest
     steps:
-      - name: Display workflow inputs and secrets
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check for custom renovate dockerfile
+        id: check-custom-image
         run: |
-          echo "String input: ${{ inputs.example-string-input }}"
-          echo "Boolean input: ${{ inputs.example-boolean-input }}"
-          echo "Number input: ${{ inputs.example-number-input }}"
-          echo "Secret: ${{ secrets.example-secret }}"
+          if [ -f devtools/renovate.Dockerfile ]; then
+            echo "custom-image=true" >> $GITHUB_OUTPUT
+          else
+            echo "No custom renovate image found; using default image"
+            echo "custom-image=false" >> $GITHUB_OUTPUT
+          fi
+
+      - if: steps.check-custom-image.outputs.custom-image == 'true'
+        uses: docker/setup-qemu-action@7e10951aea186e886cef2f1a25a7bbf4e593d710 # pin@v3
+
+      - if: steps.check-custom-image.outputs.custom-image == 'true'
+        uses: docker/setup-buildx-action@7c525be6cc8a882d5163ce04293cac18617c709f # pin@v3
+
+      - if: steps.check-custom-image.outputs.custom-image == 'true'
+        name: Build custom renovate image
+        run: docker buildx build -f devtools/renovate.Dockerfile -t ocreg.invalid/renovate:latest --load .
+
+      - name: Get GitHub token
+        id: get_github_token
+        uses: actions/create-github-app-token@v2.2.1
+        with:
+          app-id: 635546
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY_PEM }}
+          owner: coopnorge
+
+      - name: Configure Post-Upgrade Tasks
+        if: inputs.post-upgrade-command
+        env:
+          POST_UPGRADE_COMMAND: ${{ inputs.post-upgrade-command }}
+        run: |
+          COMMANDS_JSON=$(echo "$POST_UPGRADE_COMMAND" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "RENOVATE_POST_UPGRADE_TASKS={\"commands\": $COMMANDS_JSON, \"executionMode\": \"branch\"}" >> $GITHUB_ENV
+          echo "RENOVATE_ALLOWED_COMMANDS=$COMMANDS_JSON" >> $GITHUB_ENV
+
+      - name: Run Renovate
+        uses: renovatebot/github-action@d65ef9e20512193cc070238b49c3873a361cd50c # v46.1.1
+        env:
+          # Repository taken from variable to keep configuration file generic
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          # Onboarding not needed for self-hosted
+          RENOVATE_ONBOARDING: "false"
+          # Username for GitHub authentication (should match GitHub App name + [bot])
+          RENOVATE_USERNAME: "renovate-coop-norge[bot]"
+          # Git commit author used, must match GitHub App
+          RENOVATE_GIT_AUTHOR: "renovate-coop-norge <151545514+renovate-coop-norge[bot]@users.noreply.github.com>"
+          # Use GitHub API to create commits (this allows for signed commits from GitHub App)
+          RENOVATE_PLATFORM_COMMIT: "true"
+          # Override schedule if set
+          RENOVATE_FORCE: "true"
+          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
+          RENOVATE_DETECT_HOST_RULES_FROM_ENV: "true"
+          RENOVATE_GITHUB_COM_TOKEN: ${{ steps.get_github_token.outputs.token }}
+          RENOVATE_DOCKER_DOCKER_IO_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          RENOVATE_DOCKER_DOCKER_IO_PASSWORD: ${{ secrets.DOCKER_HUB_PAT }}
+          RENOVATE_TERRAFORM__MODULE_APP_SPACELIFT_IO_TOKEN: ${{ secrets.SPACELIFT_READ_TOKEN }}
+          RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN: ${{ secrets.SPACELIFT_READ_TOKEN }}
+          GONOPROXY: github.com/coopnorge
+          GONOSUMDB: github.com/coopnorge
+          GOPRIVATE: github.com/coopnorge
+        with:
+          configurationFile: ${{ inputs.config-file }}
+          token: ${{ steps.get_github_token.outputs.token }}
+          renovate-image: ${{ steps.check-custom-image.outputs.custom-image == 'true' && 'ocreg.invalid/renovate' || 'ghcr.io/renovatebot/renovate' }}
+          renovate-version: latest
