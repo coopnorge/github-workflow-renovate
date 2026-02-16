@@ -17,5 +17,5 @@ jobs:
       pull-requests: write
       id-token: write
       issues: write
-    uses: .github/workflows/renovate.yaml
+    uses: ./.github/workflows/renovate.yaml
     secrets: inherit
