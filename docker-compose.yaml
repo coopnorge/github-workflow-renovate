@@ -1,0 +1,3 @@
+include:
+  - devtools/kubernetes.yaml
+  - devtools/techdocs.yaml

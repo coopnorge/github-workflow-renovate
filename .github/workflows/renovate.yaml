@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      example-string-input:
+        type: string
+        default: example-string-input
+        required: true
+        description: |
+          Description of the example string input.
+      example-number-input:
+        type: number
+        default: 42
+        required: false
+        description: |
+          Example number input.
+      example-boolean-input:
+        type: boolean
+        default: false
+        required: false
+        description: |
+          Description of the example boolean input.
+
+    secrets:
+      example-secret:
+        required: false
+        description: |
+          Example secret.
+
+jobs:
+  show-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display workflow inputs and secrets
+        run: |
+          echo "String input: ${{ inputs.example-string-input }}"
+          echo "Boolean input: ${{ inputs.example-boolean-input }}"
+          echo "Number input: ${{ inputs.example-number-input }}"
+          echo "Secret: ${{ secrets.example-secret }}"

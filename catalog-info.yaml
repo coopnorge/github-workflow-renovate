@@ -1,0 +1,16 @@
+# nonk8s
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: renovate
+  title: Renovate Bot
+  description: Reusable GitHub workflow for renovate bot
+  annotations:
+    github.com/project-slug: coopnorge/renovate
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - github-workflow
+spec:
+  type: library
+  owner: cloud-platform
+  lifecycle: experimental
