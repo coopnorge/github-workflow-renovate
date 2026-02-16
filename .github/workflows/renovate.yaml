@@ -95,3 +95,4 @@ jobs:
           token: ${{ steps.get_github_token.outputs.token }}
           renovate-image: ${{ steps.check-custom-image.outputs.custom-image == 'true' && 'ocreg.invalid/renovate' || 'ghcr.io/renovatebot/renovate' }}
           renovate-version: latest
+          env-regex: "^(?:RENOVATE_\\w+|LOG_LEVEL|GITHUB_COM_TOKEN|NODE_OPTIONS|AWS_TOKEN|GONOPROXY|GONOSUMDB|GOPRIVATE)$"
