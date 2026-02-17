@@ -124,8 +124,8 @@ jobs:
           RENOVATE_DOCKER_DOCKER_IO_PASSWORD: ${{ env.RENOVATE_DOCKER_DOCKER_IO_PASSWORD || secrets.DOCKER_HUB_PAT }}
           RENOVATE_TERRAFORM__MODULE_APP_SPACELIFT_IO_TOKEN: ${{ env.RENOVATE_TERRAFORM__MODULE_APP_SPACELIFT_IO_TOKEN || secrets.SPACELIFT_READ_TOKEN }}
           RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN: ${{ env.RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN || secrets.SPACELIFT_READ_TOKEN }}
-          GONOPROXY: ${{ env.GONOPROXY || 'github.com/coopnorge' }}
-          GONOSUMDB: ${{ env.GONOSUMDB || 'github.com/coopnorge' }}
+          GONOPROXY: ${{ env.GONOPROXY || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
+          GONOSUMDB: ${{ env.GONOSUMDB || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
           GOPRIVATE: ${{ env.GOPRIVATE || 'github.com/coopnorge' }}
         with:
           configurationFile: ${{ inputs.config-file }}
