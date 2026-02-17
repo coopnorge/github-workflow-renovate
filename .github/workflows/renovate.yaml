@@ -12,6 +12,12 @@ on:
         required: false
         description: |
           Configuration file to use.
+      extra-env-vars:
+        type: string
+        required: false
+        description: |
+          Extra environment variables to set.
+          Format: KEY=VALUE per line.
     secrets: {}
 
 jobs:
@@ -65,34 +71,65 @@ jobs:
             echo "RENOVATE_ALLOWED_COMMANDS=$COMMANDS_JSON" >> $GITHUB_ENV
           fi
 
+      - name: Configure extra environment variables
+        id: config-env
+        env:
+          EXTRA_ENV_VARS: ${{ inputs.extra-env-vars }}
+        run: |
+          EXTRA_KEYS=""
+          if [[ -n "$EXTRA_ENV_VARS" ]]; then
+            while read -r line || [[ -n "$line" ]]; do
+              if [[ -n "$line" ]]; then
+                echo "$line" >> $GITHUB_ENV
+                KEY=${line%%=*}
+                if [[ -n "$KEY" ]]; then
+                  if [[ -z "$EXTRA_KEYS" ]]; then
+                    EXTRA_KEYS="$KEY"
+                  else
+                    EXTRA_KEYS="$EXTRA_KEYS|$KEY"
+                  fi
+                fi
+              fi
+            done <<< "$EXTRA_ENV_VARS"
+          fi
+
+          BASE_REGEX="RENOVATE_\\w+|LOG_LEVEL|GITHUB_COM_TOKEN|NODE_OPTIONS|AWS_TOKEN|GONOPROXY|GONOSUMDB|GOPRIVATE"
+          if [[ -n "$EXTRA_KEYS" ]]; then
+            FINAL_REGEX="^(?:$BASE_REGEX|$EXTRA_KEYS)$"
+          else
+            FINAL_REGEX="^(?:$BASE_REGEX)$"
+          fi
+
+          echo "env-regex=$FINAL_REGEX" >> $GITHUB_OUTPUT
+
       - name: Run Renovate
         uses: renovatebot/github-action@d65ef9e20512193cc070238b49c3873a361cd50c # v46.1.1
         env:
           # Repository taken from variable to keep configuration file generic
-          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          RENOVATE_REPOSITORIES: ${{ env.RENOVATE_REPOSITORIES || github.repository }}
           # Onboarding not needed for self-hosted
-          RENOVATE_ONBOARDING: "false"
+          RENOVATE_ONBOARDING: ${{ env.RENOVATE_ONBOARDING || 'false' }}
           # Username for GitHub authentication (should match GitHub App name + [bot])
-          RENOVATE_USERNAME: "renovate-coop-norge[bot]"
+          RENOVATE_USERNAME: ${{ env.RENOVATE_USERNAME || 'renovate-coop-norge[bot]' }}
           # Git commit author used, must match GitHub App
-          RENOVATE_GIT_AUTHOR: "renovate-coop-norge <151545514+renovate-coop-norge[bot]@users.noreply.github.com>"
+          RENOVATE_GIT_AUTHOR: ${{ env.RENOVATE_GIT_AUTHOR || 'renovate-coop-norge <151545514+renovate-coop-norge[bot]@users.noreply.github.com>' }}
           # Use GitHub API to create commits (this allows for signed commits from GitHub App)
-          RENOVATE_PLATFORM_COMMIT: "true"
+          RENOVATE_PLATFORM_COMMIT: ${{ env.RENOVATE_PLATFORM_COMMIT || 'true' }}
           # Override schedule if set
-          RENOVATE_FORCE: "true"
-          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
-          RENOVATE_DETECT_HOST_RULES_FROM_ENV: "true"
-          RENOVATE_GITHUB_COM_TOKEN: ${{ steps.get_github_token.outputs.token }}
-          RENOVATE_DOCKER_DOCKER_IO_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          RENOVATE_DOCKER_DOCKER_IO_PASSWORD: ${{ secrets.DOCKER_HUB_PAT }}
-          RENOVATE_TERRAFORM__MODULE_APP_SPACELIFT_IO_TOKEN: ${{ secrets.SPACELIFT_READ_TOKEN }}
-          RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN: ${{ secrets.SPACELIFT_READ_TOKEN }}
-          GONOPROXY: github.com/coopnorge
-          GONOSUMDB: github.com/coopnorge
-          GOPRIVATE: github.com/coopnorge
+          RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
+          LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.logLevel || 'info' }}
+          RENOVATE_DETECT_HOST_RULES_FROM_ENV: ${{ env.RENOVATE_DETECT_HOST_RULES_FROM_ENV || 'true' }}
+          RENOVATE_GITHUB_COM_TOKEN: ${{ env.RENOVATE_GITHUB_COM_TOKEN || steps.get_github_token.outputs.token }}
+          RENOVATE_DOCKER_DOCKER_IO_USERNAME: ${{ env.RENOVATE_DOCKER_DOCKER_IO_USERNAME || secrets.DOCKER_HUB_USERNAME }}
+          RENOVATE_DOCKER_DOCKER_IO_PASSWORD: ${{ env.RENOVATE_DOCKER_DOCKER_IO_PASSWORD || secrets.DOCKER_HUB_PAT }}
+          RENOVATE_TERRAFORM__MODULE_APP_SPACELIFT_IO_TOKEN: ${{ env.RENOVATE_TERRAFORM__MODULE_APP_SPACELIFT_IO_TOKEN || secrets.SPACELIFT_READ_TOKEN }}
+          RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN: ${{ env.RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN || secrets.SPACELIFT_READ_TOKEN }}
+          GONOPROXY: ${{ env.GONOPROXY || 'github.com/coopnorge' }}
+          GONOSUMDB: ${{ env.GONOSUMDB || 'github.com/coopnorge' }}
+          GOPRIVATE: ${{ env.GOPRIVATE || 'github.com/coopnorge' }}
         with:
           configurationFile: ${{ inputs.config-file }}
           token: ${{ steps.get_github_token.outputs.token }}
           renovate-image: ${{ steps.check-custom-image.outputs.custom-image == 'true' && 'ocreg.invalid/renovate' || 'ghcr.io/renovatebot/renovate' }}
           renovate-version: latest
-          env-regex: "^(?:RENOVATE_\\w+|LOG_LEVEL|GITHUB_COM_TOKEN|NODE_OPTIONS|AWS_TOKEN|GONOPROXY|GONOSUMDB|GOPRIVATE)$"
+          env-regex: ${{ steps.config-env.outputs.env-regex }}
