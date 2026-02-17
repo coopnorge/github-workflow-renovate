@@ -14,6 +14,28 @@ with custom configuration.
 
 The renovate config is expected at `.github/renovate.json5`.
 
+### Configuration
+
+Use the following default configuration in `.github/renovate.json5`:
+
+```json5
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  rebaseWhen: "conflicted",
+  labels: ["dependencies", "renovate"],
+  automerge: true,
+  automergeStrategy: "squash",
+  postUpdateOptions: ["gomodTidy", "gomodUpdateImportPaths"],
+}
+```
+
+For more examples, see the following:
+
+- <https://github.com/coopnorge/cloud-projects/blob/main/.github/renovate.json5>
+- <https://github.com/coopnorge/terraform-dataplatform-domain/blob/main/.github/renovate.json5>
+- <https://github.com/coopnorge/store-information-service/blob/main/.github/renovate.json5>
+
 ### Custom containers
 
 Custom containers may be required if you are using the input
@@ -22,6 +44,11 @@ additional tools available in path. The Dockerfile for the custom container is
 expected at `devtools/renovate.Dockerfile`. If this file exists, it is used. If
 this file does not exist, the latest version of the default renovate image is
 used.
+
+### Policy bot config update for auto-merge
+
+If you have auto-merge workflows, configure policy-bot with the username
+`renovate-coop-norge[bot]` to allow auto-merging.
 
 ### Inputs
 
