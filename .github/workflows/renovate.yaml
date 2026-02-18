@@ -68,7 +68,6 @@ jobs:
           COMMANDS_JSON=$(echo "$POST_UPGRADE_COMMAND" | jq -R -s -c 'split("\n") | map(select(length > 0))')
           if [[ "$COMMANDS_JSON" != "[]" ]]; then
             echo "RENOVATE_POST_UPGRADE_TASKS={\"commands\": $COMMANDS_JSON, \"executionMode\": \"branch\"}" >> $GITHUB_ENV
-            echo "RENOVATE_ALLOWED_COMMANDS=$COMMANDS_JSON" >> $GITHUB_ENV
           fi
 
       - name: Configure extra environment variables
@@ -124,6 +123,7 @@ jobs:
           RENOVATE_DOCKER_DOCKER_IO_PASSWORD: ${{ env.RENOVATE_DOCKER_DOCKER_IO_PASSWORD || secrets.DOCKER_HUB_PAT }}
           RENOVATE_TERRAFORM__MODULE_APP_SPACELIFT_IO_TOKEN: ${{ env.RENOVATE_TERRAFORM__MODULE_APP_SPACELIFT_IO_TOKEN || secrets.SPACELIFT_READ_TOKEN }}
           RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN: ${{ env.RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN || secrets.SPACELIFT_READ_TOKEN }}
+          RENOVATE_ALLOWED_COMMANDS: '[".*"]'
           GONOPROXY: ${{ env.GONOPROXY || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
           GONOSUMDB: ${{ env.GONOSUMDB || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
           GOPRIVATE: ${{ env.GOPRIVATE || 'github.com/coopnorge' }}
