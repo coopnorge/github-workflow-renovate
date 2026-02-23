@@ -24,6 +24,20 @@ on:
         required: false
         description: |
           Log level
+      gcp-workload-identity-provider:
+        type: string
+        required: false
+        description: |
+          Full identifier of the Workload Identity Provider,
+          e.g. projects/889992792607/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
+          Defaults to `env.PALLET_WORKLOAD_IDENTITY_PROVIDER`.
+      gcp-service-account:
+        type: string
+        required: false
+        description: |
+          Email address or unique identifier of the Google Cloud service
+          account for which to impersonate and generate credentials.
+          Defaults to `env.PALLET_SERVICE_ACCOUNT`.
     secrets: {}
 
 jobs:
@@ -65,6 +79,40 @@ jobs:
           app-id: 635546
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY_PEM }}
           owner: coopnorge
+
+      - name: Resolve GCP auth settings
+        id: gcp-auth-config
+        shell: bash
+        run: |
+          provider="${{ inputs.gcp-workload-identity-provider }}"
+          service_account="${{ inputs.gcp-service-account }}"
+
+          if [ -z "$provider" ]; then
+            provider="${{ env.PALLET_WORKLOAD_IDENTITY_PROVIDER }}"
+          fi
+
+          if [ -z "$service_account" ]; then
+            service_account="${{ env.PALLET_SERVICE_ACCOUNT }}"
+          fi
+
+          echo "gcp_workload_identity_provider=$provider" >> "$GITHUB_OUTPUT"
+          echo "gcp_service_account=$service_account" >> "$GITHUB_OUTPUT"
+
+      - name: Authenticate with GCP
+        id: gcp-auth
+        if: ${{ steps.gcp-auth-config.outputs.gcp_workload_identity_provider != '' && steps.gcp-auth-config.outputs.gcp_service_account != '' }}
+        uses: google-github-actions/auth@v3
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ steps.gcp-auth-config.outputs.gcp_workload_identity_provider }}
+          service_account: ${{ steps.gcp-auth-config.outputs.gcp_service_account }}
+          create_credentials_file: true
+
+      - name: Configure GCP auth
+        run: |
+          if [ "${{ steps.gcp-auth.outcome }}" = "success" ]; then
+            echo "RENOVATE_DOCKER_EUROPE__DOCKER_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" >> $GITHUB_ENV
+          fi
 
       - name: Configure Post-Upgrade Tasks
         if: inputs.post-upgrade-command
