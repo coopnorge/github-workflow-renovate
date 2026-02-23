@@ -18,6 +18,12 @@ on:
         description: |
           Extra environment variables to set.
           Format: KEY=VALUE per line.
+      log-level:
+        type: string
+        default: info
+        required: false
+        description: |
+          Log level
     secrets: {}
 
 jobs:
@@ -116,7 +122,7 @@ jobs:
           RENOVATE_PLATFORM_COMMIT: ${{ env.RENOVATE_PLATFORM_COMMIT || 'true' }}
           # Override schedule if set
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
-          LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.logLevel || 'info' }}
+          LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.log-level || 'info' }}
           RENOVATE_DETECT_HOST_RULES_FROM_ENV: ${{ env.RENOVATE_DETECT_HOST_RULES_FROM_ENV || 'true' }}
           RENOVATE_GITHUB_COM_TOKEN: ${{ env.RENOVATE_GITHUB_COM_TOKEN || steps.get_github_token.outputs.token }}
           RENOVATE_DOCKER_DOCKER_IO_USERNAME: ${{ env.RENOVATE_DOCKER_DOCKER_IO_USERNAME || secrets.DOCKER_HUB_USERNAME }}
