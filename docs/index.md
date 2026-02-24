@@ -65,6 +65,34 @@ inputs:
     required: false
     description: |
       Configuration file to use.
+  extra-env-vars:
+    type: string
+    required: false
+    description: |
+      Extra environment variables to set.
+      Format: KEY=VALUE per line.
+  log-level:
+    type: string
+    default: info
+    required: false
+    description: |
+      Log level.
+      Supported: trace, debug, info, warn, error, fatal
+      Default: info
+  gcp-workload-identity-provider:
+    type: string
+    required: false
+    description: |
+      Full identifier of the Workload Identity Provider,
+      e.g. projects/889992792607/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
+      Defaults to `env.PALLET_WORKLOAD_IDENTITY_PROVIDER`.
+  gcp-service-account:
+    type: string
+    required: false
+    description: |
+      Email address or unique identifier of the Google Cloud service
+      account for which to impersonate and generate credentials.
+      Defaults to `env.PALLET_SERVICE_ACCOUNT`.
 ```
 
 This job can be added to your workflow as follows:
