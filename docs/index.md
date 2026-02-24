@@ -76,7 +76,9 @@ inputs:
     default: info
     required: false
     description: |
-      Log level
+      Log level.
+      Supported: trace, debug, info, warn, error, fatal
+      Default: info
   gcp-workload-identity-provider:
     type: string
     required: false
