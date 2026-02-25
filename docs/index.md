@@ -7,6 +7,7 @@ with custom configuration.
 ## Goals
 
 - Have a ready-to-use reusable action to run renovate.
+- Provide a reusable foundation teams can extend with Renovate best practices.
 
 ## Usage
 
@@ -21,12 +22,15 @@ Use the following default configuration in `.github/renovate.json5`:
 ```json5
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended"],
+  extends: ["config:recommended", "security:minimumReleaseAgeNpm"],
   rebaseWhen: "conflicted",
   labels: ["dependencies", "renovate"],
   automerge: true,
   automergeStrategy: "squash",
   postUpdateOptions: ["gomodTidy", "gomodUpdateImportPaths"],
+  lockFileMaintenance: {
+    enabled: true,
+  },
 }
 ```
 
