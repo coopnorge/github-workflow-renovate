@@ -54,25 +54,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Check for custom renovate dockerfile
-        id: check-custom-image
+      - name: Choose custom image or fallback to default image
+        id: choose-custom-image
         run: |
-          if [ -f devtools/renovate.Dockerfile ]; then
-            echo "custom-image=true" >> $GITHUB_OUTPUT
+          # Detect if a custom image is required to run for a given repo
+          if [ -f terraform-docs.yml ]; then
+            echo "Using custom image for terraform module"
+            echo "custom-image=terraform-modules" >> $GITHUB_OUTPUT
           else
-            echo "No custom renovate image found; using default image"
+            echo "Using default image"
             echo "custom-image=false" >> $GITHUB_OUTPUT
           fi
 
-      - if: steps.check-custom-image.outputs.custom-image == 'true'
+      - uses: actions/checkout@v6
+        if: steps.choose-custom-image.outputs.custom-image != 'false'
+        with:
+          repository: 'coopnorge/github-workflow-renovate'
+          ref: pravindahal/feat/Add-custom-image-in-this-repo #TODO remove this line
+          sparse-checkout: |
+            images/
+          path: .temp/github-workflow-renovate
+
+      - if: steps.choose-custom-image.outputs.custom-image != 'false'
         uses: docker/setup-qemu-action@7e10951aea186e886cef2f1a25a7bbf4e593d710 # pin@v3
 
-      - if: steps.check-custom-image.outputs.custom-image == 'true'
+      - if: steps.choose-custom-image.outputs.custom-image != 'false'
         uses: docker/setup-buildx-action@7c525be6cc8a882d5163ce04293cac18617c709f # pin@v3
 
-      - if: steps.check-custom-image.outputs.custom-image == 'true'
+      - if: steps.choose-custom-image.outputs.custom-image != 'false'
         name: Build custom renovate image
-        run: docker buildx build -f devtools/renovate.Dockerfile -t ocreg.invalid/renovate:latest --load .
+        run: |
+          docker buildx build -f .temp/github-workflow-renovate/images/${{ steps.choose-custom-image.outputs.custom-image }}.Dockerfile -t ocreg.invalid/renovate:latest --load .
 
       - name: Get GitHub token
         id: get_github_token
