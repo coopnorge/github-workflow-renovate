@@ -15,5 +15,5 @@ permissions:
 jobs:
   supply-chain-security-validation:
     name: Supply Chain
-    uses: coopnorge/github-workflow-supply-chain-security-validation/.github/workflows/supply-chain-security-validation.yaml@main
+    uses: coopnorge/github-workflow-supply-chain-security-validation/.github/workflows/supply-chain-security-validation.yaml@pravindahal/chore/Fix-workflow-(older-version-not-working)
     secrets: inherit
