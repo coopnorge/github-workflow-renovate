@@ -75,10 +75,10 @@ jobs:
           path: .temp/github-workflow-renovate
 
       - if: steps.choose-custom-image.outputs.custom-image != 'false'
-        uses: docker/setup-qemu-action@7e10951aea186e886cef2f1a25a7bbf4e593d710 # pin@v3
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
 
       - if: steps.choose-custom-image.outputs.custom-image != 'false'
-        uses: docker/setup-buildx-action@7c525be6cc8a882d5163ce04293cac18617c709f # pin@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - if: steps.choose-custom-image.outputs.custom-image != 'false'
         name: Build custom renovate image
@@ -114,7 +114,7 @@ jobs:
       - name: Authenticate with GCP
         id: gcp-auth
         if: ${{ steps.gcp-auth-config.outputs.gcp_workload_identity_provider != '' && steps.gcp-auth-config.outputs.gcp_service_account != '' }}
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
           token_format: access_token
           workload_identity_provider: ${{ steps.gcp-auth-config.outputs.gcp_workload_identity_provider }}
