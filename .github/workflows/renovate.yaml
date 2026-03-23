@@ -198,5 +198,5 @@ jobs:
           configurationFile: ${{ inputs.config-file }}
           token: ${{ steps.get_github_token.outputs.token }}
           renovate-image: ${{ steps.choose-custom-image.outputs.custom-image != 'false' && 'ocreg.invalid/renovate' || 'ghcr.io/renovatebot/renovate' }}
-          renovate-version: latest
+          renovate-version: 43.83.2
           env-regex: ${{ steps.config-env.outputs.env-regex }}
