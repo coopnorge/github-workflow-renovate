@@ -6,4 +6,16 @@
     "automerge": true,
     "automergeStrategy": "squash",
     "rebaseWhen": "conflicted",
+    "customManagers": [
+        {
+            "customType": "regex",
+            "managerFilePatterns": ["/^.github/workflows/renovate.yaml$/"],
+            "matchStrings": [
+                "renovate-version:\\s*(?<currentValue>[0-9.]+)$"
+            ],
+            "datasourceTemplate": "github-releases",
+            "depNameTemplate": "renovatebot/renovate",
+            "versioningTemplate": "semver",
+        },
+    ],
 }
