@@ -18,10 +18,4 @@
             "versioningTemplate": "semver",
         },
     ],
-    packageRules: [
-        {
-            "matchPackageNames": ["renovate/renovate", "ghcr.io/renovatebot/renovate"],
-            "allowedVersions": "<=43.83.2"
-        },
-    ]
 }
