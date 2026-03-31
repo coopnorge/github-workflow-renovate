@@ -10,7 +10,7 @@
     ],
     "automerge": true,
     "automergeStrategy": "squash",
-    "minimumReleaseAge": "14 days"
+    "minimumReleaseAge": "14 days",
     "rebaseWhen": "conflicted",
     "postUpdateOptions": [
         "gomodTidy",
