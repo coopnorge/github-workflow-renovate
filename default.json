@@ -19,4 +19,8 @@
     "lockFileMaintenance": {
         "enabled": true,
     },
+    "osvVulnerabilityAlerts": true,
+    "vulnerabilityAlerts": {
+        "enabled": true,
+    },
 }
