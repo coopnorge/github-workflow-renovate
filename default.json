@@ -18,4 +18,20 @@
     "lockFileMaintenance": {
         "enabled": true,
     },
+    "packageRules": [
+        {
+            "description": "Disable minimum release age checks for internal dependencies",
+            "matchPackageNames": [
+                "ghcr.io/coopnorge/engineering-docker-images/**",
+                "github.com/coopnorge/**",
+                "spacelift.io/coopnorge/**",
+            ],
+            "matchManagers": [
+                "docker",
+                "gomod",
+                "iac",
+            ],
+            "minimumReleaseAge": null,
+        },
+    ],
 }
