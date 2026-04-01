@@ -11,6 +11,16 @@
                 "ghcr.io/coopnorge/engineering-docker-images/**"
             ]
         },
+        {
+            "groupName": "coopnorge devtool images",
+            "groupSlug": "engineering-docker-images",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchPackageNames": [
+                "ghcr.io/coopnorge/engineering-docker-images/**"
+            ]
+        },
     ]
 }
 
