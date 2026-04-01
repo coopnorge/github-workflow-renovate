@@ -10,6 +10,7 @@
         "renovate",
         "{{depName}}"
     ],
+    "prHourlyLimit": 5,
     "automerge": true,
     "automergeStrategy": "squash",
     "minimumReleaseAge": "14 days",
