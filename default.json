@@ -17,7 +17,7 @@
         "gomodUpdateImportPaths",
     ],
     "lockFileMaintenance": {
-        "enabled": true,
+        "enabled": false,
     },
     "osvVulnerabilityAlerts": true,
     "vulnerabilityAlerts": {
