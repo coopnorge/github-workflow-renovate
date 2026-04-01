@@ -105,7 +105,7 @@ This job can be added to your workflow as follows:
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
+      log-level:
         description: "Override default log level"
         required: false
         default: "debug"
@@ -123,4 +123,6 @@ jobs:
       issues: write
     uses: coopnorge/github-workflow-renovate/.github/workflows/renovate.yaml@v0
     secrets: inherit
+    with:
+      log-level: ${{ inputs.log-level }}
 ```
