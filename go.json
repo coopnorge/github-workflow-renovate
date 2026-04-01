@@ -2,6 +2,16 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "packageRules": [
         {
+            "description": "No update cooldown for internal coopnorge modules",
+            "minimumReleaseAge": "0 days",
+            "matchDatasources": [
+                "go"
+            ],
+            "matchPackageNames": [
+                "github.com/coopnorge/**"
+            ]
+        },
+        {
             "groupName": "dd-trace-go packages",
             "groupSlug": "dd-trace-go",
             "matchDatasources": [
