@@ -1,5 +1,5 @@
 FROM quay.io/terraform-docs/terraform-docs:0.20.0@sha256:37329e2dc2518e7f719a986a3954b10771c3fe000f50f83fd4d98d489df2eae2 AS tfdocs
-FROM ghcr.io/renovatebot/renovate:43.101.2@sha256:89a1fd5861ee1c95be19f7d18669c7dcc94c516f8399436f1465e3ef3af7f452 AS renovate
+FROM ghcr.io/renovatebot/renovate:43.102.2@sha256:22e7d1b757eb3f56f442344c8cc950f1e5ed2a17387230462304a6843864adc2 AS renovate
 
 USER root
 
