@@ -1,4 +1,15 @@
 {
-        "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "packageRules": [
+        {
+            "groupName": "dd-trace-go packages",
+            "groupSlug": "dd-trace-go",
+            "matchDatasources": [
+                "go"
+            ],
+            "matchPackageNames": [
+                "github.com/DataDog/dd-trace-go/**"
+            ]
+        }
+    ]
 }
