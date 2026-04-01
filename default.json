@@ -3,6 +3,7 @@
     "extends": [
         "config:recommended",
         "github>coopnorge/github-workflow-renovate:go.json",
+        "github>coopnorge/github-workflow-renovate:docker.json",
     ],
     "labels": [
         "dependencies",
