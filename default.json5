@@ -2,8 +2,8 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "config:recommended",
-        "github>coopnorge/github-workflow-renovate:go.json",
-        "github>coopnorge/github-workflow-renovate:docker.json",
+        "github>coopnorge/github-workflow-renovate:go.json5",
+        "github>coopnorge/github-workflow-renovate:docker.json5",
     ],
     "labels": [
         "dependencies",
