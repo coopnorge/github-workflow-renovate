@@ -4,6 +4,7 @@
         "config:recommended",
         "github>coopnorge/github-workflow-renovate:go.json5",
         "github>coopnorge/github-workflow-renovate:docker.json5",
+        "github>coopnorge/github-workflow-renovate:helm-values.json5",
     ],
     "labels": [
         "dependencies",

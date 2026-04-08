@@ -1,0 +1,67 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "packageRules": [
+    {
+      "matchManagers": [
+        "helm-values"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "rebaseWhen": "behind-base-branch",
+      "prHourlyLimit": 0,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+    },
+    {
+      "branchPrefix": "helm/dev/",
+      "matchManagers": [
+        "helm-values"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchFileNames": [
+        "/(^|/)values-dev.yaml$/"
+      ],
+      "addLabels": [
+        "development"
+      ],
+    },
+    {
+      "branchPrefix": "helm/staging/",
+      "matchManagers": [
+        "helm-values"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchFileNames": [
+        "/(^|/)values-staging.yaml$/"
+      ],
+      "addLabels": [
+        "staging"
+      ],
+    },
+    {
+      "branchPrefix": "helm/production/",
+      "matchManagers": [
+        "helm-values"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchFileNames": [
+        "/(^|/)values-production.yaml$/"
+      ],
+      "addLabels": [
+        "production"
+      ],
+    }
+  ],
+  "helm-values": {
+    "managerFilePatterns": [
+      "/(^|/)values(-\\w+)?\\.ya?ml$/"
+    ]
+  }
+}
