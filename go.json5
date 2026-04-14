@@ -22,8 +22,8 @@
             ]
         },
         {
-            "groupName": "echo packages",
-            "groupSlug": "echo",
+            "groupName": "echo go packages",
+            "groupSlug": "echo go",
             "matchDatasources": [
                 "go"
             ],
