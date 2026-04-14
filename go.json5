@@ -22,7 +22,7 @@
             ]
         },
         {
-            "groupName": "echo-go packages",
+            "groupName": "echo go packages",
             "groupSlug": "echo-go",
             "matchDatasources": [
                 "go"
