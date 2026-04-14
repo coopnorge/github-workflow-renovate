@@ -22,13 +22,19 @@ Use the following default configuration in `.github/renovate.json5`:
 ```json5
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended", "security:minimumReleaseAgeNpm"],
-  rebaseWhen: "conflicted",
-  labels: ["dependencies", "renovate"],
+  extends: ["config:recommended"],
+  labels: ["dependencies", "renovate", "{{depName}}"],
+  prHourlyLimit: 5,
   automerge: true,
   automergeStrategy: "squash",
+  minimumReleaseAge: "14 days",
+  rebaseWhen: "conflicted",
   postUpdateOptions: ["gomodTidy", "gomodUpdateImportPaths"],
   lockFileMaintenance: {
+    enabled: false,
+  },
+  osvVulnerabilityAlerts: true,
+  vulnerabilityAlerts: {
     enabled: true,
   },
 }
