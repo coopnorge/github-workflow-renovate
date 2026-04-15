@@ -20,6 +20,17 @@
             "matchPackageNames": [
                 "github.com/DataDog/dd-trace-go/**"
             ]
+        },
+        {
+            "groupName": "echo go packages",
+            "groupSlug": "echo-go",
+            "matchDatasources": [
+                "go"
+            ],
+            "matchPackageNames": [
+                "github.com/labstack/echo",
+                "github.com/labstack/echo-*"
+            ]
         }
     ]
 }
