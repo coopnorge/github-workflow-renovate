@@ -29,7 +29,7 @@
             ],
             "matchPackageNames": [
                 "github.com/labstack/echo/**",
-                "github.com/labstack/echo-jwt/**"
+                "github.com/labstack/echo-*"
             ]
         }
     ]
