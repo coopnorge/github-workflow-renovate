@@ -1,0 +1,69 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "dependencyDashboard": true,
+  // Only enable python dependency updates
+  "enabledManagers": ["pep621", "poetry", "pip_requirements"],
+
+  "addLabels": ["python"],
+  "packageRules": [
+	// Set range strategy
+	{
+      "matchManagers": ["pep621", "poetry", "pip_requirements"],
+      "rangeStrategy": "pin"
+    },
+	// Disable python version updates
+	{
+      "matchDepTypes": ["requires-python"],
+      "enabled": false
+    },
+	// Dagster Package Group
+	{
+      "matchManagers": ["pep621"],
+      "matchPackageNames": [
+        "dagster",
+        "dagster-*",
+        "dbt-core",
+        "dbt-*"
+      ],
+      "groupName": "dagster and dbt",
+      "groupSlug": "dagster-dbt",
+	  // Don't separate major and minor updates for these packages,
+	  // since they are often released together and we want to update them together
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["pep621"],
+      "matchPackageNames": [
+        "dagster",
+        "dagster-*",
+        "dbt-core",
+        "dbt-*"
+      ],
+      "matchUpdateTypes": ["major"],
+	  // If it is a major update require approval in dependency dashboard before creating a PR,
+	  // since these updates can be breaking and we want to review them before updating
+      "dependencyDashboardApproval": true
+    },
+
+	// Create a single PR for all non-major dependency updates
+    {
+      "matchManagers": ["pep621", "poetry", "pip_requirements"],
+      "matchUpdateTypes": ["patch", "minor"],
+	  // These are being handled above.
+      "excludePackageNames": [
+        "dagster",
+        "dagster-*",
+        "dbt-core",
+        "dbt-*"
+      ],
+	  "groupName": "all non-major dependencies",
+    },
+	// Disable automerge for major updates
+    {
+      "matchManagers": ["pep621", "poetry", "pip_requirements"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+    }
+  ]
+}
