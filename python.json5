@@ -5,7 +5,6 @@
   // Only enable python dependency updates
   "enabledManagers": ["pep621", "poetry", "pip_requirements"],
 
-  "addLabels": ["python"],
   "packageRules": [
 	// Set range strategy
 	{
