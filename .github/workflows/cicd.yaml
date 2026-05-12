@@ -12,7 +12,7 @@ jobs:
       contents: read
       pull-requests: read
     name: Setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       run-kubernetes-ci: ${{ ( steps.changes.outputs.kubernetes == 'true' || steps.changes.outputs.workflows == 'true' ) &&
         github.event_name == 'pull_request' }}
@@ -62,7 +62,7 @@ jobs:
       - policy-bot
       - techdocs
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions: {}
     steps:
       - run: exit 1
