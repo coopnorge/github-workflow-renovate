@@ -6,7 +6,7 @@
         "github>coopnorge/github-workflow-renovate:docker.json5",
         "github>coopnorge/github-workflow-renovate:helm-values.json5",
         "github>coopnorge/github-workflow-renovate:helm.json5",
-        "github>coopnorge/github-workflow-renovate:python.json5",
+        "github>coopnorge/github-workflow-renovate:python.json5"
     ],
     "labels": [
         "dependencies",
@@ -21,13 +21,13 @@
     "rebaseWhen": "conflicted",
     "postUpdateOptions": [
         "gomodTidy",
-        "gomodUpdateImportPaths",
+        "gomodUpdateImportPaths"
     ],
     "lockFileMaintenance": {
-        "enabled": false,
+        "enabled": false
     },
     "osvVulnerabilityAlerts": true,
     "vulnerabilityAlerts": {
-        "enabled": true,
-    },
+        "enabled": true
+    }
 }
