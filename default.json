@@ -14,6 +14,7 @@
         "{{depName}}"
     ],
     "prHourlyLimit": 5,
+    "prConcurrentLimit": 0,
     "automerge": true,
     "automergeStrategy": "squash",
     "minimumReleaseAge": "14 days",
