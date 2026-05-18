@@ -103,7 +103,7 @@ jobs:
         id: get_github_token
         uses: actions/create-github-app-token@v3.2.0
         with:
-          app-id: 635546
+          client-id: Iv1.88c3ccbe8bdd86af
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY_PEM }}
           owner: coopnorge
 
