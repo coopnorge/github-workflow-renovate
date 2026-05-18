@@ -43,6 +43,9 @@ on:
     secrets: {}
 
 env:
+  RENOVATE_CUSTOM_IMAGE: ocreg.invalid/renovate
+  RENOVATE_CUSTOM_IMAGE_VERSION: latest
+  RENOVATE_IMAGE: ghcr.io/renovatebot/renovate
   RENOVATE_VERSION: 43.182.2
 
 jobs:
@@ -86,16 +89,18 @@ jobs:
       - if: steps.choose-custom-image.outputs.custom-image != 'false'
         name: Build custom renovate image
         run: |
-          docker buildx build -f .temp/github-workflow-renovate/images/${{ steps.choose-custom-image.outputs.custom-image }}.Dockerfile -t ocreg.invalid/renovate:latest --load .
+          docker buildx build -f .temp/github-workflow-renovate/images/${{ steps.choose-custom-image.outputs.custom-image }}.Dockerfile -t $RENOVATE_CUSTOM_IMAGE:$RENOVATE_CUSTOM_IMAGE_VERSION --load .
 
-      - name: Determine renovate version to use
+      - name: Determine renovate image and version to use
         id: renovate-version
         env:
           CUSTOM_IMAGE: ${{ steps.choose-custom-image.outputs.custom-image }}
         run: |
           if [ "$CUSTOM_IMAGE" != "false" ]; then
-            echo "renovate-version=latest" >> $GITHUB_OUTPUT
+            echo "renovate-image=$RENOVATE_CUSTOM_IMAGE" >> $GITHUB_OUTPUT
+            echo "renovate-version=$RENOVATE_CUSTOM_IMAGE_VERSION" >> $GITHUB_OUTPUT
           else
+            echo "renovate-image=$RENOVATE_IMAGE" >> $GITHUB_OUTPUT
             echo "renovate-version=$RENOVATE_VERSION" >> $GITHUB_OUTPUT
           fi
 
@@ -211,6 +216,6 @@ jobs:
         with:
           configurationFile: ${{ inputs.config-file }}
           token: ${{ steps.get_github_token.outputs.token }}
-          renovate-image: ${{ steps.choose-custom-image.outputs.custom-image != 'false' && 'ocreg.invalid/renovate' || 'ghcr.io/renovatebot/renovate' }}
+          renovate-image: ${{ steps.renovate-version.outputs.renovate-image }}
           renovate-version: ${{ steps.renovate-version.outputs.renovate-version }}
           env-regex: ${{ steps.config-env.outputs.env-regex }}
