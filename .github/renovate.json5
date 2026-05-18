@@ -8,7 +8,7 @@
             "customType": "regex",
             "managerFilePatterns": ["/^\\.github/workflows/renovate\\.yaml$/"],
             "matchStrings": [
-                "renovate-version:\\s*(?<currentValue>[0-9.]+)"
+                "RENOVATE_VERSION:\\s*(?<currentValue>[0-9.]+)"
             ],
             "datasourceTemplate": "github-releases",
             "depNameTemplate": "renovatebot/renovate",

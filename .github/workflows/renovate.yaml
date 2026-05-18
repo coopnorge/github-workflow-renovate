@@ -42,6 +42,9 @@ on:
           Defaults to `vars.PALLET_SERVICE_ACCOUNT`.
     secrets: {}
 
+env:
+  RENOVATE_VERSION: 43.182.2
+
 jobs:
   renovate:
     permissions:
@@ -84,6 +87,17 @@ jobs:
         name: Build custom renovate image
         run: |
           docker buildx build -f .temp/github-workflow-renovate/images/${{ steps.choose-custom-image.outputs.custom-image }}.Dockerfile -t ocreg.invalid/renovate:latest --load .
+
+      - name: Determine renovate version to use
+        id: renovate-version
+        env:
+          CUSTOM_IMAGE: ${{ steps.choose-custom-image.outputs.custom-image }}
+        run: |
+          if [ "$CUSTOM_IMAGE" != "false" ]; then
+            echo "renovate-version=latest" >> $GITHUB_OUTPUT
+          else
+            echo "renovate-version=$RENOVATE_VERSION" >> $GITHUB_OUTPUT
+          fi
 
       - name: Get GitHub token
         id: get_github_token
@@ -198,5 +212,5 @@ jobs:
           configurationFile: ${{ inputs.config-file }}
           token: ${{ steps.get_github_token.outputs.token }}
           renovate-image: ${{ steps.choose-custom-image.outputs.custom-image != 'false' && 'ocreg.invalid/renovate' || 'ghcr.io/renovatebot/renovate' }}
-          renovate-version: 43.182.2
+          renovate-version: ${{ steps.renovate-version.outputs.renovate-version }}
           env-regex: ${{ steps.config-env.outputs.env-regex }}
