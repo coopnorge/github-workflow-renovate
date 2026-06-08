@@ -2,6 +2,9 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "packageRules": [
         {
+            thisShouldBreak: true,
+        },
+        {
             "description": "No update cooldown for internal coopnorge modules",
             "minimumReleaseAge": "0 days",
             "matchDatasources": [
