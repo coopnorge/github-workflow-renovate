@@ -32,6 +32,63 @@ For more examples, see the following:
 - <https://github.com/coopnorge/terraform-dataplatform-domain/blob/main/.github/renovate.json5>
 - <https://github.com/coopnorge/store-information-service/blob/main/.github/renovate.json5>
 
+### Validating the Renovate config
+
+The `validate-renovate-config` reusable workflow validates your Renovate config
+file on pull requests using the same version of Renovate that runs in the
+`renovate` workflow.
+
+#### Calling the workflow
+
+Add it to a workflow in your repo, for example `.github/workflows/cicd.yaml`:
+
+```yaml
+jobs:
+  validate-renovate-config:
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: coopnorge/github-workflow-renovate/.github/workflows/validate-renovate-config.yaml@v0
+```
+
+The workflow triggers on changes to common Renovate config locations
+(`.github/renovate.json5`, `renovate.json5`, `renovate.json`) and the workflow
+file itself. No further configuration is required.
+
+If your repo uses non-standard config file locations, override the defaults
+using the `config-paths` input — a newline-separated list of file paths or
+glob patterns:
+
+```yaml
+jobs:
+  validate-renovate-config:
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: coopnorge/github-workflow-renovate/.github/workflows/validate-renovate-config.yaml@v0
+    with:
+      config-paths: |
+        custom/path/renovate.json5
+        *.json5
+```
+
+#### Requiring the check to pass before merge
+
+Add the status check to your `.pallet/gitconfig.yaml`. Because this is a
+reusable workflow, the check name is prefixed with the name of the job that
+calls it (`validate-renovate-config` in the examples above):
+
+```yaml
+spec:
+  branches:
+    protection:
+      - id: main
+        pattern: main
+        requiredStatusChecks:
+          checks:
+            - "validate-renovate-config / Validate Renovate config"
+```
+
 ### Custom containers
 
 Custom containers may be required if you are using the input
