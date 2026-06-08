@@ -56,8 +56,8 @@ The workflow triggers on changes to common Renovate config locations
 file itself. No further configuration is required.
 
 If your repo uses non-standard config file locations, override the defaults
-using the `config-paths` input — a newline-separated list of file paths or
-glob patterns:
+using the `config-paths` input — a newline-separated list of file paths or glob
+patterns:
 
 ```yaml
 jobs:
