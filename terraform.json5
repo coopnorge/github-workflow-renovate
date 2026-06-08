@@ -1,0 +1,17 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "packageRules": [
+        {
+            "description": "Group google and google-beta terraform provider updates together",
+            "groupName": "terraform google providers",
+            "groupSlug": "terraform-google-providers",
+            "matchManagers": [
+                "terraform"
+            ],
+            "matchPackageNames": [
+                "google",
+                "google-beta"
+            ]
+        }
+    ]
+}
