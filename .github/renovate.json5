@@ -14,5 +14,15 @@
             "depNameTemplate": "renovatebot/renovate",
             "versioningTemplate": "semver",
         },
+        {
+            "customType": "regex",
+            "managerFilePatterns": ["/^images/terraform-modules\\.Dockerfile$/"],
+            "matchStrings": [
+                "GO_VERSION\s*=\s*(?<currentValue>[0-9.]+)"
+            ],
+            "datasourceTemplate": "golang-version",
+            "depNameTemplate": "go",
+            "versioningTemplate": "semver"
+        },
     ],
 }
