@@ -1,7 +1,7 @@
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
+      log-level:
         description: "Override default log level"
         required: false
         default: "debug"
@@ -19,3 +19,5 @@ jobs:
       issues: write
     uses: ./.github/workflows/renovate.yaml
     secrets: inherit
+    with:
+      log-level: ${{ inputs.log-level }}
