@@ -3,7 +3,7 @@ FROM ghcr.io/renovatebot/renovate:43.182.2@sha256:2fe1ed281b43b7082ecffd761940e2
 
 USER root
 
-ARG GO_VERSION=1.26.0
+ARG GO_VERSION=1.26.3
 
 RUN apt-get update && apt-get install -y curl ca-certificates \
  && rm -rf /var/lib/apt/lists/*
