@@ -67,6 +67,9 @@ jobs:
           if [ -f terraform-docs.yml ]; then
             echo "Using custom image for terraform module"
             echo "custom-image=terraform-modules" >> $GITHUB_OUTPUT
+          elif [ -f .gitmodules ] && grep -q "https://github.com/crossplane/build" .gitmodules; then
+            echo "Using custom image for crossplane provider"
+            echo "custom-image=crossplane-provider" >> $GITHUB_OUTPUT
           else
             echo "Using default image"
             echo "custom-image=false" >> $GITHUB_OUTPUT

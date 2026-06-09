@@ -16,13 +16,28 @@
         },
         {
             "customType": "regex",
-            "managerFilePatterns": ["/^images/terraform-modules\\.Dockerfile$/"],
+            "managerFilePatterns": [
+                "/^images/terraform-modules\\.Dockerfile$/",
+                "/^images/crossplane-provider\\.Dockerfile$/"
+            ],
             "matchStrings": [
                 "GO_VERSION\s*=\s*(?<currentValue>[0-9.]+)"
             ],
             "datasourceTemplate": "golang-version",
             "depNameTemplate": "go",
             "versioningTemplate": "semver"
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^images/crossplane-provider\\.Dockerfile$/"
+            ],
+            "matchStrings": [
+                "GOIMPORTS_VERSION\s*=\s*(?<currentValue>[0-9.]+)"
+            ],
+            "datasourceTemplate": "github-releases",
+            "depNameTemplate": "golang/tools",
+            "versioningTemplate": "semver",
         },
     ],
 }
