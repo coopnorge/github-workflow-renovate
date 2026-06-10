@@ -9,8 +9,8 @@
                 "terraform"
             ],
             "matchPackageNames": [
-                "google",
-                "google-beta"
+                "hashicorp/google",
+                "hashicorp/google-beta"
             ]
         }
     ]
