@@ -146,7 +146,10 @@ jobs:
       - name: Configure GCP auth
         run: |
           if [ "${{ steps.gcp-auth.outcome }}" = "success" ]; then
+            # auth for registries in europe-docker.pkg.dev/
             echo "RENOVATE_DOCKER_EUROPE__DOCKER_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" >> $GITHUB_ENV
+            # auth for registries in europe-north1-docker.pkg.dev/
+            echo "RENOVATE_DOCKER_EUROPE__NORTH1__DOCKER_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" >> $GITHUB_ENV
           fi
 
       - name: Configure Post-Upgrade Tasks
