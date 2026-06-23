@@ -46,7 +46,7 @@ env:
   RENOVATE_CUSTOM_IMAGE: ocreg.invalid/renovate
   RENOVATE_CUSTOM_IMAGE_VERSION: latest
   RENOVATE_IMAGE: ghcr.io/renovatebot/renovate
-  RENOVATE_VERSION: 43.195.8
+  RENOVATE_VERSION: 43.216.2
 
 jobs:
   renovate:
