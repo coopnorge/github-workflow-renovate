@@ -18,6 +18,8 @@
     "prConcurrentLimit": 0,
     "automerge": true,
     "automergeStrategy": "squash",
+    "prCreation": "not-pending",
+    "prNotPendingHours": 336,
     "minimumReleaseAge": "14 days",
     "rebaseWhen": "conflicted",
     "postUpdateOptions": [
