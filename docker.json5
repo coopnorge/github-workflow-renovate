@@ -4,6 +4,7 @@
         {
             "description": "No update cooldown for internal coopnorge devtool images",
             "minimumReleaseAge": "0 days",
+            "prCreation": "immediate",
             "matchDatasources": [
                 "docker"
             ],
