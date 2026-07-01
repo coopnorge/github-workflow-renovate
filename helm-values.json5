@@ -12,7 +12,6 @@
       "prHourlyLimit": 0,
       "minimumReleaseAge": "0 days",
       "prCreation": "immediate",
-      "automerge": true,
     },
     {
       "branchPrefix": "helm/dev/",
