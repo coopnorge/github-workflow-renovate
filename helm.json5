@@ -5,7 +5,6 @@
       "matchDatasources": [
         "helm"
       ],
-      "automerge": true,
       "rebaseWhen": "behind-base-branch",
       "minimumReleaseAge": "0 days",
       "prCreation": "immediate",
