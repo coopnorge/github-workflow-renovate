@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Choose custom image or fallback to default image
         id: choose-custom-image
@@ -75,7 +75,7 @@ jobs:
             echo "custom-image=false" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: steps.choose-custom-image.outputs.custom-image != 'false'
         with:
           repository: 'coopnorge/github-workflow-renovate'
