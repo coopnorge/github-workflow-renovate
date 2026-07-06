@@ -1,6 +1,6 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
-        "github>coopnorge/github-workflow-renovate:default.json"
+        "github>coopnorge/github-workflow-renovate:default.json5"
     ]
 }
