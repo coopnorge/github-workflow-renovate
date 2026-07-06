@@ -32,6 +32,17 @@
                 "github.com/labstack/echo",
                 "github.com/labstack/echo-*"
             ]
-        }
+        },
+        {
+            "groupName": "mage packages",
+            "groupSlug": "mage",
+            "matchDatasources": [
+                "go",
+            ],
+            "matchPackageNames": [
+                "github.com/coopnorge/mage",
+                "github.com/magefile/mage",
+            ],
+        },
     ]
 }
