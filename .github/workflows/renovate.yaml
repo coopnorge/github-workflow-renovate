@@ -6,6 +6,12 @@ on:
         required: false
         description: |
           Command to run after upgrade.
+      post-upgrade-env-vars:
+        type: string
+        required: false
+        description: |
+          Extra environment variables for post-upgrade tasks.
+          Format: KEY=VALUE per line. If no '=', takes the value from current env.
       config-file:
         type: string
         default: .github/renovate.json5
@@ -193,8 +199,7 @@ jobs:
 
           echo "env-regex=$FINAL_REGEX" >> $GITHUB_OUTPUT
 
-      - name: Run Renovate
-        uses: renovatebot/github-action@8217b3fc286df088d7c27f3255fe8414463bc0fd # v46.1.15
+      - name: Forward env
         env:
           # Repository taken from variable to keep configuration file generic
           RENOVATE_REPOSITORIES: ${{ env.RENOVATE_REPOSITORIES || github.repository }}
@@ -219,6 +224,45 @@ jobs:
           GONOPROXY: ${{ env.GONOPROXY || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
           GONOSUMDB: ${{ env.GONOSUMDB || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
           GOPRIVATE: ${{ env.GOPRIVATE || 'github.com/coopnorge' }}
+        run: |
+          # Forward relevant variables to GITHUB_ENV dynamically to avoid repeating them
+          while IFS='=' read -r -d '' key value; do
+            # Generate a unique delimiter for each variable
+            EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+            
+            # Write using GitHub Actions multiline syntax
+            echo "$key<<$EOF" >> "$GITHUB_ENV"
+            echo "$value" >> "$GITHUB_ENV"
+            echo "$EOF" >> "$GITHUB_ENV"
+          done < <(env -0)
+
+      - name: Populate post-upgrade env
+        env:
+          POST_UPGRADE_ENV_VARS: ${{ inputs.post-upgrade-env-vars }}
+        run: |
+          JSON_OBJ="{}"
+          
+          if [[ -n "$POST_UPGRADE_ENV_VARS" ]]; then
+            while read -r line || [[ -n "$line" ]]; do
+              if [[ -n "$line" ]]; then
+                if [[ "$line" == *"="* ]]; then
+                  KEY="${line%%=*}"
+                  VALUE="${line#*=}"
+                else
+                  KEY="$line"
+                  VALUE="${!KEY}"
+                fi
+                JSON_OBJ=$(echo "$JSON_OBJ" | jq -c --arg k "$KEY" --arg v "$VALUE" '.[$k] = $v')
+              fi
+            done <<< "$POST_UPGRADE_ENV_VARS"
+          fi
+          
+          if [[ "$JSON_OBJ" != "{}" ]]; then
+            echo "RENOVATE_CUSTOM_ENV_VARIABLES=$JSON_OBJ" >> $GITHUB_ENV
+          fi
+
+      - name: Run Renovate
+        uses: renovatebot/github-action@8217b3fc286df088d7c27f3255fe8414463bc0fd # v46.1.15
         with:
           configurationFile: ${{ inputs.config-file }}
           token: ${{ steps.get_github_token.outputs.token }}
