@@ -9,7 +9,8 @@
                 "docker"
             ],
             "matchPackageNames": [
-                "ghcr.io/coopnorge/engineering-docker-images/**"
+                "ghcr.io/coopnorge/engineering-docker-images/**",
+                "europe-docker.pkg.dev/helmbasecharts-shared-5ebb/**",
             ]
         },
         {
