@@ -81,10 +81,20 @@ jobs:
             echo "custom-image=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Get workflow version
+        id: get-workflow-version
+        env:
+          WORKFLOW_REF: ${{ job.workflow_ref }}
+        run: |
+          CALLED_VERSION=$(echo "$WORKFLOW_REF" | awk -F'@' '{print $2}')
+          CALLED_VERSION="${CALLED_VERSION:-main}"
+          echo "called-version=$CALLED_VERSION" >> $GITHUB_OUTPUT
+
       - uses: actions/checkout@v7
         if: steps.choose-custom-image.outputs.custom-image != 'false'
         with:
           repository: 'coopnorge/github-workflow-renovate'
+          ref: ${{ steps.get-workflow-version.outputs.called-version }}
           sparse-checkout: |
             images/
           path: .temp/github-workflow-renovate
