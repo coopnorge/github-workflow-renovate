@@ -53,6 +53,9 @@ env:
   RENOVATE_CUSTOM_IMAGE_VERSION: latest
   RENOVATE_IMAGE: ghcr.io/renovatebot/renovate
   RENOVATE_VERSION: 43.224.1
+  RENOVATE_APP_CLIENT_ID: Iv1.88c3ccbe8bdd86af
+  GITHUB_ORG: coopnorge
+  SELF_REPO: coopnorge/github-workflow-renovate
 
 jobs:
   renovate:
@@ -84,7 +87,7 @@ jobs:
       - uses: actions/checkout@v7
         if: steps.choose-custom-image.outputs.custom-image != 'false'
         with:
-          repository: 'coopnorge/github-workflow-renovate'
+          repository: ${{ env.SELF_REPO }}
           sparse-checkout: |
             images/
           path: .temp/github-workflow-renovate
@@ -117,9 +120,9 @@ jobs:
         id: get_github_token
         uses: actions/create-github-app-token@v3.2.0
         with:
-          client-id: Iv1.88c3ccbe8bdd86af
+          client-id: ${{ env.RENOVATE_APP_CLIENT_ID }}
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY_PEM }}
-          owner: coopnorge
+          owner: ${{ env.GITHUB_ORG }}
 
       - name: Resolve GCP auth settings
         id: gcp-auth-config
