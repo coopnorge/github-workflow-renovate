@@ -9,7 +9,7 @@
                 "terraform"
             ],
             "matchPackageNames": [
-                "/^spacelift.io\/coopnorge\/**/",
+                "/^spacelift.io\/coopnorge\/.*/",
             ],
         },
         {
