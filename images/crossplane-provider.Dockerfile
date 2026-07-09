@@ -15,8 +15,6 @@ RUN curl -fsSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -o /tmp/go.t
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 
+RUN GOBIN=/usr/local/go/bin go install golang.org/x/tools/cmd/goimports@v${GOIMPORTS_VERSION}
+
 USER ubuntu
-
-RUN go install golang.org/x/tools/cmd/goimports@v${GOIMPORTS_VERSION}
-
-ENV PATH="/home/ubuntu/go/bin:${PATH}"
