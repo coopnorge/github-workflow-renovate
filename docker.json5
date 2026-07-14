@@ -21,8 +21,8 @@
             ],
             "matchPackageNames": [
                 "ghcr.io/coopnorge/engineering-docker-images/**"
-            ]
+            ],
+            "commitMessageSuffix": "({{#if newDigest}}{{newDigestShort}}{{else}}{{newValue}}{{/if}})"
         },
-    ]
+    ],
 }
-
