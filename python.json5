@@ -13,11 +13,10 @@
     },
     // Dagster Package Group
     {
-      "matchManagers": ["pep621"],
+      "matchManagers": ["pep621", "poetry", "pip_requirements"],
       "matchPackageNames": [
         "dagster",
         "dagster-**",
-        "dbt-core",
         "dbt-**",
       ],
       "groupName": "dagster and dbt",
@@ -27,11 +26,10 @@
       "separateMajorMinor": false
     },
     {
-      "matchManagers": ["pep621"],
+      "matchManagers": ["pep621", "poetry", "pip_requirements"],
       "matchPackageNames": [
         "dagster",
-        "dagster-**",
-        "dbt-core",
+        "dagster-**", 
         "dbt-**"
       ],
       "matchUpdateTypes": ["major"],
@@ -43,14 +41,12 @@
     {
       "matchManagers": ["pep621", "poetry", "pip_requirements"],
       "matchUpdateTypes": ["patch", "minor"],
-      // Match all packages
-      "matchPackageNames": ["**"],
       // Exclude dagster and dbt so they aren't bundled in the catch-all
-      "excludePackageNames": [
-        "dagster",
-        "dagster-**",
-        "dbt-core",
-        "dbt-**"
+      "matchPackageNames": [
+        "**",
+        "!dagster",
+        "!dagster-**",
+        "!dbt-**"
       ],
       "groupName": "all non-major dependencies"
     },
