@@ -23,7 +23,8 @@
       "groupSlug": "dagster-dbt",
       // Don't separate major and minor updates for these packages,
       // since they are often released together and we want to update them together
-      "separateMajorMinor": false
+      "separateMajorMinor": false,
+      "commitMessageSuffix": "to {{newValue}}",
     },
     {
       "matchManagers": ["pep621", "poetry", "pip_requirements"],
