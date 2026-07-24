@@ -52,7 +52,7 @@ env:
   RENOVATE_CUSTOM_IMAGE: ocreg.invalid/renovate
   RENOVATE_CUSTOM_IMAGE_VERSION: latest
   RENOVATE_IMAGE: ghcr.io/renovatebot/renovate
-  RENOVATE_VERSION: 43.255.2
+  RENOVATE_VERSION: 43.257.2
   RENOVATE_APP_CLIENT_ID: Iv1.88c3ccbe8bdd86af
   GITHUB_ORG: coopnorge
   SELF_REPO: coopnorge/github-workflow-renovate
