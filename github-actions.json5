@@ -11,5 +11,12 @@
                 "!coopnorge/**",
             ],
         },
+        {
+            "description": "No update cooldown for internal coopnorge actions",
+            "matchDatasources": ["github-tags"],
+            "matchPackageNames": ["coopnorge/**"],
+            "minimumReleaseAge": "0 days",
+            "prCreation": "immediate"
+        },
     ],
 }
