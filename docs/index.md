@@ -55,6 +55,12 @@ inputs:
     required: false
     description: |
       Command to run after upgrade.
+  post-upgrade-env-vars:
+    type: string
+    required: false
+    description: |
+      Extra environment variables for post-upgrade tasks.
+      Format: KEY=VALUE per line. If no '=', takes the value from current env.
   config-file:
     type: string
     default: .github/renovate.json5
