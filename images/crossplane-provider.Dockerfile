@@ -1,4 +1,4 @@
-FROM ghcr.io/renovatebot/renovate:43.182.2@sha256:2fe1ed281b43b7082ecffd761940e2d039b1fc46198e69ac80a415545e49f3ae AS renovate
+FROM ghcr.io/renovatebot/renovate:43.285.3@sha256:a1059bb5311c57f518c538665484d2a64517d8a0b23208b53d8cfdc477dab7d5 AS renovate
 
 USER root
 
