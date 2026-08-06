@@ -1,0 +1,16 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "packageRules": [
+        {
+            "description": "No update cooldown for internal coopnorge js packages",
+            "minimumReleaseAge": "0 days",
+            "prCreation": "immediate",
+            "matchDatasources": [
+                "npm"
+            ],
+            "matchPackageNames": [
+                "@coopnorge/**",
+            ]
+        },
+    ],
+}
