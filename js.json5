@@ -12,5 +12,17 @@
                 "@coopnorge/**",
             ]
         },
+        {
+            "description": "Group react-router and react-router-dom npm packages updates together",
+            "groupName": "react-router",
+            "groupSlug": "terraform-google-providersreact-router",
+            "matchDatasources": [
+                "npm"
+            ],
+            "matchPackageNames": [
+                "react-router",
+                "react-router-dom",
+            ],
+        }
     ],
 }
