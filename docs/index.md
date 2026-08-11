@@ -46,6 +46,49 @@ used.
 If you have auto-merge workflows, configure policy-bot with the username
 `renovate-coop-norge[bot]` to allow auto-merging.
 
+### Helm image tag detection
+
+Renovate uses the `helm-values` manager to detect Docker image updates in Helm
+value files matching `values.yaml`, `values-dev.yaml`, `values-staging.yaml`,
+and `values-production.yaml`.
+
+When using environment-specific value files, make sure each file defines all of
+the following keys explicitly:
+
+- `image.registry`
+- `image.repository`
+- `image.tag`
+
+Renovate does not detect inherited image values from a base `values.yaml`, so if
+an environment-specific file only overrides part of the image configuration, the
+image tag may not be tracked.
+
+The current `image.tag` value also needs to use a tag format that Renovate can
+recognize as version-like, parse, and compare for that image. Docker tags are
+not true versions, so Renovate applies Docker-specific versioning rules when
+deciding whether a tag can be updated.
+
+In practice, this means:
+
+- Renovate only checks for tag upgrades when the current tag looks like a
+  version.
+- Renovate expects the current tag and newer tags to follow a comparable version
+  scheme.
+- Renovate preserves version precision, so `1.2` is typically updated to `1.3`
+  rather than `1.2.1`.
+- Renovate treats the text after the first hyphen as a compatibility suffix, so
+  tags such as `1.2.3-alpine` are updated within that same suffix stream.
+- Renovate does not support commit-hash-like Docker tags, so tags that look like
+  Git SHAs are ignored.
+
+If you change an image from one tagging scheme to another, such as from Git-SHA
+tags to date-based tags, Renovate may not detect that transition automatically.
+In that case, update the tag manually to the new scheme first.
+
+If an image uses a non-standard tagging scheme, you may need to add a Renovate
+`packageRules` override with a different `versioning` strategy, such as `loose`,
+`semver`, `pep440`, or `regex`.
+
 ### Inputs
 
 ```yaml
@@ -124,3 +167,8 @@ jobs:
     with:
       log-level: ${{ inputs.log-level }}
 ```
+
+## References
+
+- <https://docs.renovatebot.com/docker/>
+- <https://docs.renovatebot.com/modules/versioning/docker/>
