@@ -237,6 +237,7 @@ jobs:
           RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN: ${{ env.RENOVATE_TERRAFORM__MODULE_SPACELIFT_IO_TOKEN || secrets.SPACELIFT_READ_TOKEN }}
           # need a PAT for the following because app tokens are not supported as of this writing: https://github.com/orgs/community/discussions/26920
           RENOVATE_NPM_NPM_PKG_GITHUB_COM_TOKEN: ${{ secrets.GH_PACKAGES_READ_PAT }}
+          RENOVATE_NUGET_NUGET_PKG_GITHUB_COM_TOKEN: ${{ secrets.GH_PACKAGES_READ_PAT }}
           RENOVATE_ALLOWED_COMMANDS: '[".*"]'
           GONOPROXY: ${{ env.GONOPROXY || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
           GONOSUMDB: ${{ env.GONOSUMDB || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
