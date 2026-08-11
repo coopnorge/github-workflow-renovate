@@ -1,0 +1,20 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "packageRules": [
+        {
+            "description": "No update cooldown for internal coopnorge nuget packages",
+            "minimumReleaseAge": "0 days",
+            "prCreation": "immediate",
+            "matchDatasources": [
+                "nuget"
+            ],
+            "matchPackageNames": [
+                "CoopNorge.**",
+            ],
+            "registryUrls": [
+                "https://api.nuget.org/v3/index.json",
+                "https://nuget.pkg.github.com/coopnorge/index.json",
+            ],
+        }
+    ],
+}
