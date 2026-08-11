@@ -11,10 +11,16 @@
             "matchPackageNames": [
                 "CoopNorge.**",
             ],
+        },
+        {
+            "description": "Additional registry urls for nuget",
+            "matchDatasources": [
+                "nuget"
+            ],
             "registryUrls": [
                 "https://api.nuget.org/v3/index.json",
                 "https://nuget.pkg.github.com/coopnorge/index.json",
             ],
-        }
+        },
     ],
 }
