@@ -23,7 +23,6 @@
                 "hashicorp/google",
                 "hashicorp/google-beta"
             ],
-            "commitMessageSuffix": "to {{newValue}}",
         }
     ]
 }
