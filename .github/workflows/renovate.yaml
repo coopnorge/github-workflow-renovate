@@ -239,7 +239,7 @@ jobs:
           RENOVATE_NPM_NPM_PKG_GITHUB_COM_TOKEN: ${{ secrets.GH_PACKAGES_READ_PAT }}
           RENOVATE_NUGET_NUGET_PKG_GITHUB_COM_TOKEN: ${{ secrets.GH_PACKAGES_READ_PAT }}
           # making the PAT available for other use-cases, like downloading release assets for private repos
-          GH_PACKAGES_READ_PAT: ${{ secrets.REVIEWBOT_GITHUB_TOKEN }}
+          GH_REPO_PAT: ${{ secrets.GH_REPO_PAT }}
           RENOVATE_ALLOWED_COMMANDS: '[".*"]'
           GONOPROXY: ${{ env.GONOPROXY || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
           GONOSUMDB: ${{ env.GONOSUMDB || 'github.com/coopnorge,github:com/envoyproxy/protoc-gen-validate' }}
