@@ -8,7 +8,7 @@
         "github>coopnorge/github-workflow-renovate:helm-values.json5",
         "github>coopnorge/github-workflow-renovate:python.json5",
         "github>coopnorge/github-workflow-renovate:terraform.json5",
-        "github>coopnorge/github-workflow-renovate:github-actions.json5",
+        "github>coopnorge/github-workflow-renovate:github.json5",
         "github>coopnorge/github-workflow-renovate:js.json5",
     ],
     "labels": [
