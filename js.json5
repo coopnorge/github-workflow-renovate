@@ -14,8 +14,8 @@
         },
         {
             "description": "Group react-router and react-router-dom npm packages updates together",
-            "groupName": "react-router",
-            "groupSlug": "terraform-google-providersreact-router",
+            "groupName": "react-router packages",
+            "groupSlug": "react-router-pkgs",
             "matchDatasources": [
                 "npm"
             ],
