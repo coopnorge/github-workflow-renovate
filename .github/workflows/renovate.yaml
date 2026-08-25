@@ -162,16 +162,35 @@ jobs:
           create_credentials_file: true
 
       - name: Configure GCP auth
+        if: steps.gcp-auth.outcome == 'success'
         run: |
-          if [ "${{ steps.gcp-auth.outcome }}" = "success" ]; then
-            for REGION in "EUROPE" "EUROPE__NORTH1"; do
-              for MAPPING in "DOCKER:DOCKER" "MAVEN:MAVEN" "NPM:NPM" "PYPI:PYTHON" "GO:GO" "APT:APT" "RPM:YUM" "NUGET:NUGET" "RUBYGEMS:RUBY" "CARGO:CARGO" "HELM:DOCKER"; do
-                PREFIX="${MAPPING%%:*}"
-                SUFFIX="${MAPPING##*:}"
-                echo "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" >> $GITHUB_ENV
-              done
+          for REGION in \
+            "EUROPE" \
+            "EUROPE__NORTH1" \
+          ; 
+            do
+              for MAPPING in \
+                "DOCKER:DOCKER" \
+                "MAVEN:MAVEN" \
+                "NPM:NPM" \
+                "PYPI:PYTHON" \
+                "GO:GO" \
+                "APT:APT" \
+                "RPM:YUM" \
+                "NUGET:NUGET" \
+                "RUBYGEMS:RUBY" \
+                "CARGO:CARGO" \
+                "HELM:DOCKER" \
+              ;
+                do
+                  PREFIX="${MAPPING%%:*}"
+                  SUFFIX="${MAPPING##*:}"
+
+                  printf '%s\n' \
+                    "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" \
+                    >> "$GITHUB_ENV"
+                done
             done
-          fi
 
       - name: Configure Post-Upgrade Tasks
         if: inputs.post-upgrade-command
