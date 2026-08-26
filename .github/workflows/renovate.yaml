@@ -304,6 +304,9 @@ jobs:
             done <<< "$POST_UPGRADE_ENV_VARS"
           fi
           
+          # Add UV_INDEX to post-upgrade
+          JSON_OBJ=$(echo "$JSON_OBJ" | jq -c --arg v "$UV_INDEX" '.UV_INDEX = $v')
+          
           if [[ "$JSON_OBJ" != "{}" ]]; then
             echo "RENOVATE_CUSTOM_ENV_VARIABLES=$JSON_OBJ" >> $GITHUB_ENV
           fi
