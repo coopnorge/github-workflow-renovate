@@ -58,6 +58,15 @@
       "matchManagers": ["pep621", "poetry", "pip_requirements"],
       "matchUpdateTypes": ["major"],
       "automerge": false,
-    }
+    },
+    // No update cooldown for internal coopnorge packages
+    {
+      "description": "No update cooldown for internal coopnorge python packages",
+      "minimumReleaseAge": "0 days",
+      "prCreation": "immediate",
+      "matchRegistryUrls": [
+        "https://europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple/",
+      ],
+    },
   ]
 }
