@@ -191,7 +191,7 @@ jobs:
                     "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" \
                     >> "$GITHUB_ENV"
 
-                  if [ "$PREFIX" = "PYPI" ]; then
+                  if [ "$PREFIX" = "PYPI" ] && [ "$REGION" = "EUROPE__NORTH1" ]; then
                     FMT_REGION="${REGION,,}"
                     FMT_REGION="${FMT_REGION//__/-}"
                     UV_INDEX="${UV_INDEX}${UV_INDEX:+ }https://oauth2accesstoken:${{ steps.gcp-auth.outputs.access_token }}@${FMT_REGION}-python.pkg.dev/engineering-production-af50/engineering-pypi/simple/"
