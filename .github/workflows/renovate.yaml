@@ -270,13 +270,13 @@ jobs:
             echo "Release title matched: '$RELEASE_TITLE'"
             echo 'managers=["helm-values"]' >> "$GITHUB_OUTPUT"
             echo 'include_paths="infrastructure/kubernetes/helm/**"' >> "$GITHUB_OUTPUT"
-            echo 'issue_title="Dependency Dashboard OCI Helm updates"'
+            echo 'issue_title="Dependency Dashboard OCI Helm updates"' >> "$GITHUB_OUTPUT"
 
       - name: Patch issue title
         id: issue_title
         if: ${{ inputs.renovate-enabled-managers || inputs.renovate-include-paths }}
         run: |
-          echo 'issue_title="Dependency Dashboard OCI Helm updates"'
+          echo 'issue_title="Dependency Dashboard OCI Helm updates"' >> "$GITHUB_OUTPUT"
 
       - name: Forward env
         env:
