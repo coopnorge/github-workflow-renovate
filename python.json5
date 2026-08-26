@@ -66,6 +66,7 @@
       "prCreation": "immediate",
       "matchRegistryUrls": [
         "https://europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple/",
+        "https://europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple",
       ],
     },
   ]
