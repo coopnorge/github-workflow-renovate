@@ -270,6 +270,13 @@ jobs:
             echo "Release title matched: '$RELEASE_TITLE'"
             echo 'managers=["helm-values"]' >> "$GITHUB_OUTPUT"
             echo 'include_paths="infrastructure/kubernetes/helm/**"' >> "$GITHUB_OUTPUT"
+            echo 'issue_title="Dependency Dashboard OCI Helm updates"'
+
+      - name: Patch issue title
+        id: issue_title
+        if: ${{ inputs.renovate-enabled-managers || inputs.renovate-include-paths }}
+        run: |
+          echo 'issue_title="Dependency Dashboard OCI Helm updates"'
 
       - name: Forward env
         env:
@@ -287,6 +294,7 @@ jobs:
           RENOVATE_ENABLED_MANAGERS: ${{ steps.renovate_enabled_managers.outputs.managers || inputs.renovate-enabled-managers }}
           # Only includde certain paths, to improve performance
           RENOVATE_INCLUDE_PATHS: ${{ steps.renovate_enabled_managers.outputs.include_paths || inputs.renovate-include-paths }}
+          RENOVATE_DEPENDENCY_DASHBOARD_TITLE: ${{ steps.renovate_enabled_managers.outputs.issue_title || steps.issue_title.outputs.issue_title || "Dependency Dashboard" }}
           # Override schedule if set
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
           RENOVATE_REPOSITORY_CACHE: true
