@@ -164,6 +164,7 @@ jobs:
       - name: Configure GCP auth
         if: steps.gcp-auth.outcome == 'success'
         run: |
+          UV_INDEX=""
           for REGION in \
             "EUROPE" \
             "EUROPE__NORTH1" \
@@ -189,8 +190,15 @@ jobs:
                   printf '%s\n' \
                     "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" \
                     >> "$GITHUB_ENV"
+
+                  if [ "$PREFIX" = "PYPI" ]; then
+                    FMT_REGION="${REGION,,}"
+                    FMT_REGION="${FMT_REGION//__/-}"
+                    UV_INDEX="${UV_INDEX}${UV_INDEX:+ }https://oauth2accesstoken:${{ steps.gcp-auth.outputs.access_token }}@${FMT_REGION}-python.pkg.dev/engineering-production-af50/engineering-pypi/simple/"
+                  fi
                 done
             done
+            printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV"
 
       - name: Configure Post-Upgrade Tasks
         if: inputs.post-upgrade-command
