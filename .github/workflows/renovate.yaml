@@ -46,6 +46,21 @@ on:
           Email address or unique identifier of the Google Cloud service
           account for which to impersonate and generate credentials.
           Defaults to `vars.PALLET_SERVICE_ACCOUNT`.
+      renovate-enabled-managers:
+        type: string
+        required: false
+        description: |
+          Allows to override the managers uses in this renovate run. It can be used to
+          limit which types of depenencies can be updated. Input should be an json array
+          as a string.
+      renovate-include-paths:
+        type: string
+        required: false
+        description: |
+          Limit which directories renovate scans. It can be used to
+          limit which types of depenencies can be updated. Input should be an json array
+          as a string.
+
     secrets: {}
 
 env:
@@ -56,6 +71,12 @@ env:
   RENOVATE_APP_CLIENT_ID: Iv1.88c3ccbe8bdd86af
   GITHUB_ORG: coopnorge
   SELF_REPO: coopnorge/github-workflow-renovate
+  # This is the dir renovate provides -- if we set our own directory via cacheDir, we can run into permissions issues.
+  # It is also possible to cache a higher level of the directory, but it has minimal benefit. While renovate execution
+  # time gets faster, it also takes longer to upload the cache as it grows bigger.
+  cache_dir: /tmp/renovate/cache/renovate/repository
+  # This can be manually changed to bust the cache if necessary.
+  cache_key: renovate-cache
 
 jobs:
   renovate:
@@ -168,7 +189,7 @@ jobs:
           for REGION in \
             "EUROPE" \
             "EUROPE__NORTH1" \
-          ; 
+          ;
             do
               for MAPPING in \
                 "DOCKER:DOCKER" \
@@ -241,6 +262,30 @@ jobs:
 
           echo "env-regex=$FINAL_REGEX" >> $GITHUB_OUTPUT
 
+      - name: Check if this is Go OCI release and limit renovate manager
+        id: renovate_enabled_managers
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          EXPECTED_TITLE="Go OCI Release ${TAG_NAME}"
+
+          # Fetch release title (returns empty string if release does not exist)
+          RELEASE_TITLE=$(gh release view "$TAG_NAME" --json name -q '.name' 2>/dev/null || echo "")
+
+          if [ "$RELEASE_TITLE" = "$EXPECTED_TITLE" ]; then
+            echo "Release title matched: '$RELEASE_TITLE'"
+            echo 'managers=["helm-values"]' >> "$GITHUB_OUTPUT"
+            echo 'include_paths="infrastructure/kubernetes/helm/**"' >> "$GITHUB_OUTPUT"
+            echo 'issue_title="Dependency Dashboard OCI Helm updates"' >> "$GITHUB_OUTPUT"
+
+      - name: Patch issue title
+        id: issue_title
+        if: ${{ inputs.renovate-enabled-managers || inputs.renovate-include-paths }}
+        run: |
+          echo 'issue_title="Dependency Dashboard OCI Helm updates"' >> "$GITHUB_OUTPUT"
+
       - name: Forward env
         env:
           # Repository taken from variable to keep configuration file generic
@@ -253,8 +298,14 @@ jobs:
           RENOVATE_GIT_AUTHOR: ${{ env.RENOVATE_GIT_AUTHOR || 'renovate-coop-norge <151545514+renovate-coop-norge[bot]@users.noreply.github.com>' }}
           # Use GitHub API to create commits (this allows for signed commits from GitHub App)
           RENOVATE_PLATFORM_COMMIT: ${{ env.RENOVATE_PLATFORM_COMMIT || 'true' }}
+          # Set the used managers, can be limited if we only want a certain manager
+          RENOVATE_ENABLED_MANAGERS: ${{ steps.renovate_enabled_managers.outputs.managers || inputs.renovate-enabled-managers }}
+          # Only includde certain paths, to improve performance
+          RENOVATE_INCLUDE_PATHS: ${{ steps.renovate_enabled_managers.outputs.include_paths || inputs.renovate-include-paths }}
+          RENOVATE_DEPENDENCY_DASHBOARD_TITLE: ${{ steps.renovate_enabled_managers.outputs.issue_title || steps.issue_title.outputs.issue_title || 'Dependency Dashboard' }}
           # Override schedule if set
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
+          RENOVATE_REPOSITORY_CACHE: true
           LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.log-level || 'info' }}
           RENOVATE_DETECT_HOST_RULES_FROM_ENV: ${{ env.RENOVATE_DETECT_HOST_RULES_FROM_ENV || 'true' }}
           RENOVATE_GITHUB_COM_TOKEN: ${{ env.RENOVATE_GITHUB_COM_TOKEN || steps.get_github_token.outputs.token }}
@@ -276,7 +327,7 @@ jobs:
           while IFS='=' read -r -d '' key value; do
             # Generate a unique delimiter for each variable
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-            
+
             # Write using GitHub Actions multiline syntax
             echo "$key<<$EOF" >> "$GITHUB_ENV"
             echo "$value" >> "$GITHUB_ENV"
@@ -288,7 +339,7 @@ jobs:
           POST_UPGRADE_ENV_VARS: ${{ inputs.post-upgrade-env-vars }}
         run: |
           JSON_OBJ="{}"
-          
+
           if [[ -n "$POST_UPGRADE_ENV_VARS" ]]; then
             while read -r line || [[ -n "$line" ]]; do
               if [[ -n "$line" ]]; then
@@ -303,10 +354,26 @@ jobs:
               fi
             done <<< "$POST_UPGRADE_ENV_VARS"
           fi
-          
+
           if [[ "$JSON_OBJ" != "{}" ]]; then
             echo "RENOVATE_CUSTOM_ENV_VARIABLES=$JSON_OBJ" >> $GITHUB_ENV
           fi
+
+      - name: Restore renovate cache
+        id: cache-restore
+        if: github.event.inputs.repoCache != 'disabled' && github.event.inputs.repoCache != 'reset'
+        uses: actions/cache/restore@v6.1.0
+        with:
+          path: ${{ env.cache_dir }}
+          key: ${{ env.cache_key }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ${{ env.cache_key }}-
+
+      - name: Fix restored cache ownership
+        if: steps.cache-restore.outputs.cache-matched-key != ''
+        run: |
+          sudo chown -R 12021:0 /tmp/renovate/
+          ls -R $cache_dir
 
       - name: Run Renovate
         uses: renovatebot/github-action@e09d604f8f803bb527bd8321ed5be06c460b8682 # v46.2.2
@@ -316,3 +383,10 @@ jobs:
           renovate-image: ${{ steps.renovate-version.outputs.renovate-image }}
           renovate-version: ${{ steps.renovate-version.outputs.renovate-version }}
           env-regex: ${{ steps.config-env.outputs.env-regex }}
+
+      - name: Save renovate cache
+        if: github.event.inputs.repoCache != 'disabled' && steps.cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6.1.0
+        with:
+          path: ${{ env.cache_dir }}
+          key: ${{ env.cache_key }}-${{ github.run_id }}-${{ github.run_attempt }}
