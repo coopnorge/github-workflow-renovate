@@ -294,7 +294,7 @@ jobs:
           RENOVATE_ENABLED_MANAGERS: ${{ steps.renovate_enabled_managers.outputs.managers || inputs.renovate-enabled-managers }}
           # Only includde certain paths, to improve performance
           RENOVATE_INCLUDE_PATHS: ${{ steps.renovate_enabled_managers.outputs.include_paths || inputs.renovate-include-paths }}
-          RENOVATE_DEPENDENCY_DASHBOARD_TITLE: ${{ steps.renovate_enabled_managers.outputs.issue_title || steps.issue_title.outputs.issue_title || "Dependency Dashboard" }}
+          RENOVATE_DEPENDENCY_DASHBOARD_TITLE: ${{ steps.renovate_enabled_managers.outputs.issue_title || steps.issue_title.outputs.issue_title || 'Dependency Dashboard' }}
           # Override schedule if set
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
           RENOVATE_REPOSITORY_CACHE: true
