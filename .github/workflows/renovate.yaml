@@ -71,6 +71,12 @@ env:
   RENOVATE_APP_CLIENT_ID: Iv1.88c3ccbe8bdd86af
   GITHUB_ORG: coopnorge
   SELF_REPO: coopnorge/github-workflow-renovate
+  # This is the dir renovate provides -- if we set our own directory via cacheDir, we can run into permissions issues.
+  # It is also possible to cache a higher level of the directory, but it has minimal benefit. While renovate execution
+  # time gets faster, it also takes longer to upload the cache as it grows bigger.
+  cache_dir: /tmp/renovate/cache/renovate/repository
+  # This can be manually changed to bust the cache if necessary.
+  cache_key: renovate-cache
 
 jobs:
   renovate:
