@@ -53,6 +53,14 @@ on:
           Allows to override the managers uses in this renovate run. It can be used to
           limit which types of depenencies can be updated. Input should be an json array
           as a string.
+      renovate-include-paths:
+        type: string
+        required: false
+        description: |
+          Limit which directories renovate scans. It can be used to
+          limit which types of depenencies can be updated. Input should be an json array
+          as a string.
+
     secrets: {}
 
 env:
@@ -255,6 +263,7 @@ jobs:
           if [ "$RELEASE_TITLE" = "$EXPECTED_TITLE" ]; then
             echo "Release title matched: '$RELEASE_TITLE'"
             echo 'managers=["helm-values"]' >> "$GITHUB_OUTPUT"
+            echo 'include_paths="infrastructure/kubernetes/helm/**"' >> "$GITHUB_OUTPUT"
 
       - name: Forward env
         env:
@@ -270,6 +279,8 @@ jobs:
           RENOVATE_PLATFORM_COMMIT: ${{ env.RENOVATE_PLATFORM_COMMIT || 'true' }}
           # Set the used managers, can be limited if we only want a certain manager
           RENOVATE_ENABELD_MANAGERS: ${{ steps.renovate_enabled_managers.outputs.managers || inputs.renovate-enabled-managers }}
+          # Only includde certain paths, to improve performance
+          RENOVATE_INCLUDE_PATHS: ${{ steps.renovate_enabled_managers.outputs.include_paths || inputs.renovate-include-paths }}
           # Override schedule if set
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
           LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.log-level || 'info' }}
