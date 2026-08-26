@@ -46,6 +46,13 @@ on:
           Email address or unique identifier of the Google Cloud service
           account for which to impersonate and generate credentials.
           Defaults to `vars.PALLET_SERVICE_ACCOUNT`.
+      renovate-enabled-managers:
+        type: string
+        required: false
+        description: |
+          Allows to override the managers uses in this renovate run. It can be used to
+          limit which types of depenencies can be updated. Input should be an json array
+          as a string.
     secrets: {}
 
 env:
@@ -167,7 +174,7 @@ jobs:
           for REGION in \
             "EUROPE" \
             "EUROPE__NORTH1" \
-          ; 
+          ;
             do
               for MAPPING in \
                 "DOCKER:DOCKER" \
@@ -233,6 +240,22 @@ jobs:
 
           echo "env-regex=$FINAL_REGEX" >> $GITHUB_OUTPUT
 
+      - name: Check if this is Go OCI release and limit renovate manager
+        id: renovate_enabled_managers
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          EXPECTED_TITLE="Go OCI Release ${TAG_NAME}"
+
+          # Fetch release title (returns empty string if release does not exist)
+          RELEASE_TITLE=$(gh release view "$TAG_NAME" --json name -q '.name' 2>/dev/null || echo "")
+
+          if [ "$RELEASE_TITLE" = "$EXPECTED_TITLE" ]; then
+            echo "Release title matched: '$RELEASE_TITLE'"
+            echo 'managers=["helm-values"]' >> "$GITHUB_OUTPUT"
+
       - name: Forward env
         env:
           # Repository taken from variable to keep configuration file generic
@@ -245,6 +268,8 @@ jobs:
           RENOVATE_GIT_AUTHOR: ${{ env.RENOVATE_GIT_AUTHOR || 'renovate-coop-norge <151545514+renovate-coop-norge[bot]@users.noreply.github.com>' }}
           # Use GitHub API to create commits (this allows for signed commits from GitHub App)
           RENOVATE_PLATFORM_COMMIT: ${{ env.RENOVATE_PLATFORM_COMMIT || 'true' }}
+          # Set the used managers, can be limited if we only want a certain manager
+          RENOVATE_ENABELD_MANAGERS: ${{ steps.renovate_enabled_managers.outputs.managers || inputs.renovate-enabled-managers }}
           # Override schedule if set
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
           LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.log-level || 'info' }}
@@ -268,7 +293,7 @@ jobs:
           while IFS='=' read -r -d '' key value; do
             # Generate a unique delimiter for each variable
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-            
+
             # Write using GitHub Actions multiline syntax
             echo "$key<<$EOF" >> "$GITHUB_ENV"
             echo "$value" >> "$GITHUB_ENV"
@@ -280,7 +305,7 @@ jobs:
           POST_UPGRADE_ENV_VARS: ${{ inputs.post-upgrade-env-vars }}
         run: |
           JSON_OBJ="{}"
-          
+
           if [[ -n "$POST_UPGRADE_ENV_VARS" ]]; then
             while read -r line || [[ -n "$line" ]]; do
               if [[ -n "$line" ]]; then
@@ -295,7 +320,7 @@ jobs:
               fi
             done <<< "$POST_UPGRADE_ENV_VARS"
           fi
-          
+
           if [[ "$JSON_OBJ" != "{}" ]]; then
             echo "RENOVATE_CUSTOM_ENV_VARIABLES=$JSON_OBJ" >> $GITHUB_ENV
           fi
