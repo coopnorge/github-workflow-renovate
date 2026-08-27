@@ -191,7 +191,7 @@ jobs:
                     "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" \
                     >> "$GITHUB_ENV"
 
-                  if [ "$PREFIX" = "PYPI" ]; then
+                  if [ "$PREFIX" = "PYPI" ] && [ "$REGION" = "EUROPE__NORTH1" ]; then
                     FMT_REGION="${REGION,,}"
                     FMT_REGION="${FMT_REGION//__/-}"
                     UV_INDEX="${UV_INDEX}${UV_INDEX:+ }https://oauth2accesstoken:${{ steps.gcp-auth.outputs.access_token }}@${FMT_REGION}-python.pkg.dev/engineering-production-af50/engineering-pypi/simple/"
@@ -302,6 +302,11 @@ jobs:
                 JSON_OBJ=$(echo "$JSON_OBJ" | jq -c --arg k "$KEY" --arg v "$VALUE" '.[$k] = $v')
               fi
             done <<< "$POST_UPGRADE_ENV_VARS"
+          fi
+          
+          # Add UV_INDEX to post-upgrade
+          if [[ -n "$UV_INDEX" ]]; then
+            JSON_OBJ=$(echo "$JSON_OBJ" | jq -c --arg v "$UV_INDEX" '.UV_INDEX = $v')
           fi
           
           if [[ "$JSON_OBJ" != "{}" ]]; then
