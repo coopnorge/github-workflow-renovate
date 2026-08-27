@@ -153,6 +153,7 @@ jobs:
             >> "$GITHUB_ENV"
           # The env var UV_INDEX is explicitly added to RENOVATE_CUSTOM_ENV_VARIABLES in a later step
           UV_INDEX="https://oauth2accesstoken:${{ steps.gcp-auth-pypi.outputs.access_token }}@${{ env.ENGINEERING_PYPI_REGISTRY_URL }}/"
+          printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV" 
 
       - name: Resolve GCP auth settings
         id: gcp-auth-config
@@ -194,7 +195,6 @@ jobs:
                 "DOCKER:DOCKER" \
                 "MAVEN:MAVEN" \
                 "NPM:NPM" \
-                "PYPI:PYTHON" \
                 "GO:GO" \
                 "APT:APT" \
                 "RPM:YUM" \
@@ -213,7 +213,6 @@ jobs:
 
                 done
             done
-            printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV"
 
       - name: Configure Post-Upgrade Tasks
         if: inputs.post-upgrade-command
