@@ -89,6 +89,32 @@ If an image uses a non-standard tagging scheme, you may need to add a Renovate
 `packageRules` override with a different `versioning` strategy, such as `loose`,
 `semver`, `pep440`, or `regex`.
 
+### Configuring authentication to coopnorge PyPI repository
+
+The
+[shared coopnorge PyPI repository](https://console.cloud.google.com/artifacts/python/engineering-production-af50/europe-north1/engineering-pypi?project=engineering-production-af50)
+is hosted in a GCP project managed within the
+[coopnorge/engineering-infrastructure](https://github.com/coopnorge/engineering-infrastructure)
+repository.
+
+This Renovate workflow sets up the authentication token for the registry, but
+the access permissions must first be configured in
+[terraform/service_accounts.tf](https://github.com/coopnorge/engineering-infrastructure/blob/main/terraform/service_accounts.tf).
+To grant access, add your repository to the `github_auth_to_gcp_sa_mapping`
+dictionary as follows:
+
+```hcl
+  github_auth_to_gcp_sa_mapping = {
+    # ...
+    # ...
+    # ...
+    github-actions-your-repo = {
+      sa_name   = module.service_accounts.service_accounts["github-actions"].id
+      attribute = "attribute.repository/coopnorge/your-repo"
+    }
+  }
+```
+
 ### Inputs
 
 ```yaml
