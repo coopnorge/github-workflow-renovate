@@ -25,7 +25,7 @@
       // since they are often released together and we want to update them together
       "separateMajorMinor": false,
       "commitMessageSuffix": "to {{newValue}}",
-	  "automerge": true
+      "automerge": true
     },
     {
       "matchManagers": ["pep621", "poetry", "pip_requirements"],
@@ -51,7 +51,7 @@
         "!dbt-**"
       ],
       "groupName": "all non-major dependencies",
-	  "automerge": true
+      "automerge": true
     },
     // Disable automerge for major updates
     {
