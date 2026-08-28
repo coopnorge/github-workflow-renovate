@@ -56,9 +56,6 @@ env:
   RENOVATE_APP_CLIENT_ID: Iv1.88c3ccbe8bdd86af
   GITHUB_ORG: coopnorge
   SELF_REPO: coopnorge/github-workflow-renovate
-  ENGINEERING_PYPI_REGISTRY_URL: europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple
-  ENGINEERING_PYPI_WORKLOAD_IDENTITY_PROVIDER: projects/943318002566/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
-  ENGINEERING_PYPI_GCP_SERVICE_ACCOUNT: github-actions@engineering-production-af50.iam.gserviceaccount.com
 
 jobs:
   renovate:
@@ -136,25 +133,6 @@ jobs:
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY_PEM }}
           owner: ${{ env.GITHUB_ORG }}
 
-      - name: Authenticate with GCP for Engineering pypi
-        id: gcp-auth-pypi
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
-        with:
-          token_format: access_token
-          workload_identity_provider: ${{ env.ENGINEERING_PYPI_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.ENGINEERING_PYPI_GCP_SERVICE_ACCOUNT }}
-          create_credentials_file: true
-
-      - name: Configure GCP auth for pypi
-        if: steps.gcp-auth-pypi.outcome == 'success'
-        run: |
-          printf '%s\n' \
-            "RENOVATE_PYPI_EUROPE__NORTH1__PYTHON_PKG_DEV_TOKEN=${{ steps.gcp-auth-pypi.outputs.access_token }}" \
-            >> "$GITHUB_ENV"
-          # The env var UV_INDEX is explicitly added to RENOVATE_CUSTOM_ENV_VARIABLES in a later step
-          UV_INDEX="https://oauth2accesstoken:${{ steps.gcp-auth-pypi.outputs.access_token }}@${{ env.ENGINEERING_PYPI_REGISTRY_URL }}/"
-          printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV" 
-
       - name: Resolve GCP auth settings
         id: gcp-auth-config
         shell: bash
@@ -186,6 +164,7 @@ jobs:
       - name: Configure GCP auth
         if: steps.gcp-auth.outcome == 'success'
         run: |
+          UV_INDEX=""
           for REGION in \
             "EUROPE" \
             "EUROPE__NORTH1" \
@@ -195,6 +174,7 @@ jobs:
                 "DOCKER:DOCKER" \
                 "MAVEN:MAVEN" \
                 "NPM:NPM" \
+                "PYPI:PYTHON" \
                 "GO:GO" \
                 "APT:APT" \
                 "RPM:YUM" \
@@ -211,8 +191,14 @@ jobs:
                     "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" \
                     >> "$GITHUB_ENV"
 
+                  if [ "$PREFIX" = "PYPI" ] && [ "$REGION" = "EUROPE__NORTH1" ]; then
+                    FMT_REGION="${REGION,,}"
+                    FMT_REGION="${FMT_REGION//__/-}"
+                    UV_INDEX="${UV_INDEX}${UV_INDEX:+ }https://oauth2accesstoken:${{ steps.gcp-auth.outputs.access_token }}@${FMT_REGION}-python.pkg.dev/engineering-production-af50/engineering-pypi/simple/"
+                  fi
                 done
             done
+            printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV"
 
       - name: Configure Post-Upgrade Tasks
         if: inputs.post-upgrade-command
