@@ -144,6 +144,7 @@ jobs:
           workload_identity_provider: ${{ env.ENGINEERING_PYPI_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ env.ENGINEERING_PYPI_GCP_SERVICE_ACCOUNT }}
           create_credentials_file: true
+        continue-on-error: true
 
       - name: Configure GCP auth for pypi
         if: steps.gcp-auth-pypi.outcome == 'success'
