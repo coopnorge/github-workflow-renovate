@@ -137,6 +137,8 @@ jobs:
           owner: ${{ env.GITHUB_ORG }}
 
       - name: Authenticate with GCP for Engineering pypi
+        # for debug
+        if: steps.get_github_token.outcome == 'cancelled'
         id: gcp-auth-pypi
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
