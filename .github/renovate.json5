@@ -27,4 +27,15 @@
             "versioningTemplate": "semver"
         },
     ],
+    "packageRules": [
+        {
+            "groupName": "renovate version",
+            "groupSlug": "renovate",
+            "matchPackageNames": [
+                "ghcr.io/renovatebot/renovate",
+                "renovatebot/github-action",
+                "renovatebot/renovate",
+            ],
+        },
+    ],
 }
