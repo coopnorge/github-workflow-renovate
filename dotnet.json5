@@ -15,6 +15,16 @@
                 "https://api.nuget.org/v3/index.json",
                 "https://nuget.pkg.github.com/coopnorge/index.json",
             ],
-        }
+        },
+        {
+            "description": "Limit Azure Functions Storage Blobs extension to max 6.8.1",
+            "matchDatasources": [
+                "nuget"
+            ],
+            "matchPackageNames": [
+                "Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs",
+            ],
+            "allowedVersions": "<=6.8.1",
+         }
     ],
 }
