@@ -10,7 +10,7 @@
       ],
       "rebaseWhen": "behind-base-branch",
       "prHourlyLimit": 0,
-      "minimumReleaseAge": "0 days",
+      "minimumReleaseAge": null, // 0 days
       "prCreation": "immediate",
     },
     {

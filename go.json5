@@ -3,7 +3,7 @@
     "packageRules": [
         {
             "description": "No update cooldown for internal coopnorge modules",
-            "minimumReleaseAge": "0 days",
+            "minimumReleaseAge": null, // 0 days
             "prCreation": "immediate",
             "matchDatasources": [
                 "go"
