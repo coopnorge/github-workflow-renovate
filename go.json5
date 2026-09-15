@@ -45,6 +45,16 @@
             ],
         },
         {
+            "groupName": "golang x-packages",
+            "groupSlug": "golang-x-packages",
+            "matchDatasources": [
+                "go",
+            ],
+            "matchPackageNames": [
+                "golang.org/x/*",
+            ],
+        },
+        {
             "description": "Bump the go directive version in go.mod",
             "matchManagers": ["gomod"],
             "matchDepNames": ["go"],
