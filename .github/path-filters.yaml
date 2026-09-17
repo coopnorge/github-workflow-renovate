@@ -11,3 +11,8 @@ techdocs:
   - docs/**
   - devtools/techdocs.*
   - .vale/**
+renovate-config:
+  - 'default.json'
+  - '*.json5'
+  - '.github/renovate.json5'
+  - '.github/workflows/validate-renovate-config.yaml'
