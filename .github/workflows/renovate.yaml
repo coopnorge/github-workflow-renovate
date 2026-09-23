@@ -59,6 +59,12 @@ env:
   ENGINEERING_PYPI_REGISTRY_URL: europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple
   ENGINEERING_PYPI_WORKLOAD_IDENTITY_PROVIDER: projects/943318002566/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
   ENGINEERING_PYPI_GCP_SERVICE_ACCOUNT: github-actions@engineering-production-af50.iam.gserviceaccount.com
+  # This is the dir renovate provides -- if we set our own directory via cacheDir, we can run into permissions issues.
+  # It is also possible to cache a higher level of the directory, but it has minimal benefit. While renovate execution
+  # time gets faster, it also takes longer to upload the cache as it grows bigger.
+  cache_dir: /tmp/renovate/cache/renovate/repository
+  # This can be manually changed to bust the cache if necessary.
+  cache_key: renovate-cache
 
 jobs:
   renovate:
@@ -154,7 +160,7 @@ jobs:
             >> "$GITHUB_ENV"
           # The env var UV_INDEX is explicitly added to RENOVATE_CUSTOM_ENV_VARIABLES in a later step
           UV_INDEX="https://oauth2accesstoken:${{ steps.gcp-auth-pypi.outputs.access_token }}@${{ env.ENGINEERING_PYPI_REGISTRY_URL }}/"
-          printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV" 
+          printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV"
 
       - name: Resolve GCP auth settings
         id: gcp-auth-config
@@ -190,7 +196,7 @@ jobs:
           for REGION in \
             "EUROPE" \
             "EUROPE__NORTH1" \
-          ; 
+          ;
             do
               for MAPPING in \
                 "DOCKER:DOCKER" \
@@ -270,6 +276,7 @@ jobs:
           RENOVATE_PLATFORM_COMMIT: ${{ env.RENOVATE_PLATFORM_COMMIT || 'true' }}
           # Override schedule if set
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
+          RENOVATE_REPOSITORY_CACHE: "enabled"
           LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.log-level || 'info' }}
           RENOVATE_DETECT_HOST_RULES_FROM_ENV: ${{ env.RENOVATE_DETECT_HOST_RULES_FROM_ENV || 'true' }}
           RENOVATE_GITHUB_COM_TOKEN: ${{ env.RENOVATE_GITHUB_COM_TOKEN || steps.get_github_token.outputs.token }}
@@ -291,7 +298,7 @@ jobs:
           while IFS='=' read -r -d '' key value; do
             # Generate a unique delimiter for each variable
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-            
+
             # Write using GitHub Actions multiline syntax
             echo "$key<<$EOF" >> "$GITHUB_ENV"
             echo "$value" >> "$GITHUB_ENV"
@@ -303,7 +310,7 @@ jobs:
           POST_UPGRADE_ENV_VARS: ${{ inputs.post-upgrade-env-vars }}
         run: |
           JSON_OBJ="{}"
-          
+
           if [[ -n "$POST_UPGRADE_ENV_VARS" ]]; then
             while read -r line || [[ -n "$line" ]]; do
               if [[ -n "$line" ]]; then
@@ -318,15 +325,31 @@ jobs:
               fi
             done <<< "$POST_UPGRADE_ENV_VARS"
           fi
-          
+
           # Add UV_INDEX to post-upgrade
           if [[ -n "$UV_INDEX" ]]; then
             JSON_OBJ=$(echo "$JSON_OBJ" | jq -c --arg v "$UV_INDEX" '.UV_INDEX = $v')
           fi
-          
+
           if [[ "$JSON_OBJ" != "{}" ]]; then
             echo "RENOVATE_CUSTOM_ENV_VARIABLES=$JSON_OBJ" >> $GITHUB_ENV
           fi
+
+      - name: Restore renovate cache
+        id: cache-restore
+        if: github.event.inputs.repoCache != 'disabled' && github.event.inputs.repoCache != 'reset'
+        uses: actions/cache/restore@v6.1.0
+        with:
+          path: ${{ env.cache_dir }}
+          key: ${{ env.cache_key }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ${{ env.cache_key }}-
+
+      - name: Fix restored cache ownership
+        if: steps.cache-restore.outputs.cache-matched-key != ''
+        run: |
+          sudo chown -R 12021:0 /tmp/renovate/
+          ls -R $cache_dir
 
       - name: Run Renovate
         uses: renovatebot/github-action@37beffda261423addd537c33f2d126df7f6ffbab # v46.2.6
@@ -336,3 +359,10 @@ jobs:
           renovate-image: ${{ steps.renovate-version.outputs.renovate-image }}
           renovate-version: ${{ steps.renovate-version.outputs.renovate-version }}
           env-regex: ${{ steps.config-env.outputs.env-regex }}
+
+      - name: Save renovate cache
+        if: github.event.inputs.repoCache != 'disabled' && steps.cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6.1.0
+        with:
+          path: ${{ env.cache_dir }}
+          key: ${{ env.cache_key }}-${{ github.run_id }}-${{ github.run_attempt }}
