@@ -7,7 +7,6 @@
             ],
             "pinDigests": true,
             "matchPackageNames": [
-                "!actions/**",
                 "!coopnorge/**",
             ],
         },
