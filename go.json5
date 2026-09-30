@@ -1,5 +1,20 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "customManagers": [
+        {
+            // Track coopnorge/mage version in GitHub Actions workflow files so it is grouped with the go.mod update.
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^\\.github/(workflows|actions)/.+\\.yaml$/",
+            ],
+            "matchStrings": [
+                "coopnorge/mage/[^@]+@(?<currentValue>v[^\\s\\n]+)",
+            ],
+            "depNameTemplate": "coopnorge/mage",
+            "datasourceTemplate": "github-tags",
+            "versioningTemplate": "semver",
+        },
+    ],
     "packageRules": [
         {
             "description": "No update cooldown for internal coopnorge modules",
@@ -38,10 +53,12 @@
             "groupSlug": "mage",
             "matchDatasources": [
                 "go",
+                "github-tags", // GitHub workflow/action
             ],
             "matchPackageNames": [
                 "github.com/coopnorge/mage",
                 "github.com/magefile/mage",
+                "coopnorge/mage", // GitHub workflow/action
             ],
         },
         {
