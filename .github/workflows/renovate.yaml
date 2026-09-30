@@ -46,6 +46,14 @@ on:
           Email address or unique identifier of the Google Cloud service
           account for which to impersonate and generate credentials.
           Defaults to `vars.PALLET_SERVICE_ACCOUNT`.
+      renovate-cache:
+        type: string
+        default: enabled
+        required: false
+        description: |
+          Controls the Renovate repository cache.
+          Supported: enabled, disabled, reset
+          Default: enabled
     secrets: {}
 
 env:
@@ -276,7 +284,7 @@ jobs:
           RENOVATE_PLATFORM_COMMIT: ${{ env.RENOVATE_PLATFORM_COMMIT || 'true' }}
           # Override schedule if set
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
-          RENOVATE_REPOSITORY_CACHE: "enabled"
+          RENOVATE_REPOSITORY_CACHE: ${{ inputs.renovate-cache || 'enabled' }}
           LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.log-level || 'info' }}
           RENOVATE_DETECT_HOST_RULES_FROM_ENV: ${{ env.RENOVATE_DETECT_HOST_RULES_FROM_ENV || 'true' }}
           RENOVATE_GITHUB_COM_TOKEN: ${{ env.RENOVATE_GITHUB_COM_TOKEN || steps.get_github_token.outputs.token }}
@@ -337,7 +345,7 @@ jobs:
 
       - name: Restore renovate cache
         id: cache-restore
-        if: github.event.inputs.repoCache != 'disabled' && github.event.inputs.repoCache != 'reset'
+        if: inputs.renovate-cache != 'disabled'
         uses: actions/cache/restore@v6.1.0
         with:
           path: ${{ env.cache_dir }}
@@ -361,7 +369,7 @@ jobs:
           env-regex: ${{ steps.config-env.outputs.env-regex }}
 
       - name: Save renovate cache
-        if: github.event.inputs.repoCache != 'disabled' && steps.cache-restore.outputs.cache-hit != 'true'
+        if: inputs.renovate-cache != 'disabled' && steps.cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6.1.0
         with:
           path: ${{ env.cache_dir }}
