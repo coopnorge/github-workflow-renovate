@@ -60,7 +60,7 @@ env:
   RENOVATE_CUSTOM_IMAGE: ocreg.invalid/renovate
   RENOVATE_CUSTOM_IMAGE_VERSION: latest
   RENOVATE_IMAGE: ghcr.io/renovatebot/renovate
-  RENOVATE_VERSION: 44.77.0
+  RENOVATE_VERSION: 44.103.2
   RENOVATE_APP_CLIENT_ID: Iv1.88c3ccbe8bdd86af
   GITHUB_ORG: coopnorge
   SELF_REPO: coopnorge/github-workflow-renovate
@@ -369,7 +369,7 @@ jobs:
           ls -R $cache_dir
 
       - name: Run Renovate
-        uses: renovatebot/github-action@37beffda261423addd537c33f2d126df7f6ffbab # v46.2.6
+        uses: renovatebot/github-action@dcfba84a42d1b5d5e49bf131b1bf53511851a123 # v46.3.1
         with:
           configurationFile: ${{ inputs.config-file }}
           token: ${{ steps.get_github_token.outputs.token }}
