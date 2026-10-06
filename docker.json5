@@ -2,15 +2,27 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "packageRules": [
         {
-            "description": "No update cooldown for internal coopnorge devtool images",
+            "description": "No update cooldown for internal coopnorge images",
             "minimumReleaseAge": null, // 0 days
             "prCreation": "immediate",
             "matchDatasources": [
                 "docker"
             ],
             "matchPackageNames": [
-                "ghcr.io/coopnorge/engineering-docker-images/**",
+                "ghcr.io/coopnorge/**",
                 "europe-docker.pkg.dev/helmbasecharts-shared-5ebb/**",
+            ]
+        },
+        {
+            "description": "No update cooldown for internal coopnorge helm base charts",
+            "minimumReleaseAge": null, // 0 days
+            "prCreation": "immediate",
+            "matchManagers": [
+                "helmv3"
+            ],
+            "matchDepNames": [
+                "coop-app-chart",
+                "coop-job-chart",
             ]
         },
         {
