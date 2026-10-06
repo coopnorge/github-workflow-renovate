@@ -49,15 +49,15 @@
             ]
         },
         {
-            "groupName": "mage packages",
-            "groupSlug": "mage",
+            "description": "Separate group for internal coopnorge mage so branch renovate/coopnorge-mage identifies internal-only updates",
+            "groupName": "coopnorge mage",
+            "groupSlug": "coopnorge-mage",
             "matchDatasources": [
                 "go",
                 "github-tags", // GitHub workflow/action
             ],
             "matchPackageNames": [
                 "github.com/coopnorge/mage",
-                "github.com/magefile/mage",
                 "coopnorge/mage", // GitHub workflow/action
             ],
         },
