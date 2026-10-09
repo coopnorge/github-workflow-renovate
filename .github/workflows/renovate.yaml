@@ -54,6 +54,13 @@ on:
           Controls the Renovate repository cache.
           Supported: enabled, disabled, reset
           Default: enabled
+      forward-logs-to-datadog:
+        type: boolean
+        default: false
+        required: false
+        description: |
+          Controls whether logs are forwarded to datadog.
+          Default: false
     secrets: {}
 
 env:
@@ -73,6 +80,7 @@ env:
   cache_dir: /tmp/renovate/cache/renovate/repository
   # This can be manually changed to bust the cache if necessary.
   cache_key: renovate-cache
+  DATADOG_SITE: datadoghq.eu
 
 jobs:
   renovate:
@@ -295,6 +303,8 @@ jobs:
           RENOVATE_FORCE: ${{ env.RENOVATE_FORCE || 'true' }}
           RENOVATE_REPOSITORY_CACHE: ${{ inputs.renovate-cache || 'enabled' }}
           LOG_LEVEL: ${{ env.LOG_LEVEL || inputs.log-level || 'info' }}
+          RENOVATE_LOG_FILE_LEVEL: ${{ env.LOG_LEVEL || inputs.log-level || 'info' }}
+          RENOVATE_LOG_FILE: ${{ inputs.forward-logs-to-datadog && '/tmp/renovate.log.json' || '' }}
           RENOVATE_DETECT_HOST_RULES_FROM_ENV: ${{ env.RENOVATE_DETECT_HOST_RULES_FROM_ENV || 'true' }}
           RENOVATE_GITHUB_COM_TOKEN: ${{ env.RENOVATE_GITHUB_COM_TOKEN || steps.get_github_token.outputs.token }}
           RENOVATE_DOCKER_DOCKER_IO_USERNAME: ${{ env.RENOVATE_DOCKER_DOCKER_IO_USERNAME || secrets.DOCKER_HUB_USERNAME }}
@@ -368,6 +378,56 @@ jobs:
           sudo chown -R 12021:0 /tmp/renovate/
           ls -R $cache_dir
 
+      # - name: Initialize Log Streamer
+      #   if: ${{ inputs.forward-logs-to-datadog }}
+      #   env:
+      #     DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      #   run: |
+      #     PIPE=/tmp/renovate.pipe
+      #     rm -f "$PIPE"
+      #     mkfifo "$PIPE"
+
+      #     TAGS="repository:${GITHUB_REPOSITORY},branch:${GITHUB_REF_NAME},run_id:${GITHUB_RUN_ID},actor:${GITHUB_ACTOR},env:ci"
+
+      #     # Background shipper: reads lines from pipe, flushes batches to Datadog
+      #     (
+      #       exec 3< "$PIPE"
+      #       BATCH="["
+      #       COUNT=0
+      #       LAST_FLUSH=$(date +%s)
+
+      #       flush() {
+      #         if [ "$COUNT" -gt 0 ]; then
+      #           BATCH="${BATCH%?}]"
+      #           curl -sS -X POST "https://http-intake.logs.${DATADOG_SITE}/api/v2/logs?ddtags=${TAGS}" \
+      #             -H "Content-Type: application/json" \
+      #             -H "DD-API-KEY: ${DATADOG_API_KEY}" \
+      #             -H "DD-EVP-ORIGIN: github-actions" \
+      #             -H "DD-SERVICE: renovate" \
+      #             -H "DD-SOURCE: renovate" \
+      #             --data-raw "$BATCH" > /dev/null || true
+      #           BATCH="["
+      #           COUNT=0
+      #           LAST_FLUSH=$(date +%s)
+      #         fi
+      #       }
+
+      #       while IFS= read -r line <&3 || [ "$COUNT" -gt 0 ]; do
+      #         if [ -n "$line" ]; then
+      #           BATCH="${BATCH}${line},"
+      #           COUNT=$((COUNT + 1))
+      #         fi
+
+      #         NOW=$(date +%s)
+      #         # Flush every 25 lines or 3 seconds, whichever comes first
+      #         if [ "$COUNT" -ge 25 ] || { [ "$COUNT" -gt 0 ] && [ $((NOW - LAST_FLUSH)) -ge 3 ]; }; then
+      #           flush
+      #         fi
+      #       done
+      #       exec 3<&-
+      #     ) &
+      #     echo "SHIPPER_PID=$!" >> "$GITHUB_ENV"
+
       - name: Run Renovate
         uses: renovatebot/github-action@37beffda261423addd537c33f2d126df7f6ffbab # v46.2.6
         with:
@@ -376,6 +436,54 @@ jobs:
           renovate-image: ${{ steps.renovate-version.outputs.renovate-image }}
           renovate-version: ${{ steps.renovate-version.outputs.renovate-version }}
           env-regex: ${{ steps.config-env.outputs.env-regex }}
+
+      # - name: Stop log Streamer
+      #   if: always()
+      #   run: |
+      #     PIPE=/tmp/renovate.pipe
+      #     # Unblock the pipe reader loop by sending EOF
+      #     echo "" > "$PIPE" 2>/dev/null || true
+      #     if [ -n "$SHIPPER_PID" ]; then
+      #       wait "$SHIPPER_PID" 2>/dev/null || true
+      #     fi
+      #     rm -f "$PIPE"
+
+      - name: Inspect and Upload Logs to Datadog
+        if: ${{ inputs.forward-logs-to-datadog }}
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          LOG_PATH="/tmp/renovate.log.json"
+
+          if [ ! -f "$LOG_PATH" ] || [ ! -s "$LOG_PATH" ]; then
+            echo "::warning::Log file missing or empty. Skipping."
+            exit 0
+          fi
+
+          # Wrap newline-delimited JSON objects into a valid JSON array
+          jq -s '.' "$LOG_PATH" > /tmp/renovate_array.json
+
+          TAGS="repository:${GITHUB_REPOSITORY},run_id:${GITHUB_RUN_ID},actor:${GITHUB_ACTOR}"
+
+          HTTP_CODE=$(curl -s -o /tmp/dd_response.txt -w "%{http_code}" \
+            -X POST "https://http-intake.logs.${DATADOG_SITE}/api/v2/logs?ddtags=${TAGS}" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: ${DATADOG_API_KEY}" \
+            -H "DD-EVP-ORIGIN: github-actions" \
+            -H "DD-SERVICE: renovate" \
+            -H "DD-SOURCE: renovate" \
+            --data-binary @/tmp/renovate_array.json)
+
+          echo "Datadog response status: HTTP $HTTP_CODE"
+          cat /tmp/dd_response.txt
+          echo ""
+
+          if [ "$HTTP_CODE" -ne 200 ] && [ "$HTTP_CODE" -ne 202 ]; then
+            echo "::error::Datadog intake rejected payload with HTTP $HTTP_CODE"
+            exit 1
+          fi
+
+          echo "All $(jq 'length' /tmp/renovate_array.json) log events accepted."
 
       - name: Save renovate cache
         if: inputs.renovate-cache != 'disabled' && steps.cache-restore.outputs.cache-hit != 'true'
