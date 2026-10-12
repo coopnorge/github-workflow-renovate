@@ -463,7 +463,7 @@ jobs:
           # Wrap newline-delimited JSON objects into a valid JSON array
           jq -s '.' "$LOG_PATH" > /tmp/renovate_array.json
 
-          TAGS="repository:${GITHUB_REPOSITORY},run_id:${GITHUB_RUN_ID},actor:${GITHUB_ACTOR}"
+          TAGS="repository:${GITHUB_REPOSITORY},branch:${GITHUB_REF_NAME},run_id:${GITHUB_RUN_ID},actor:${GITHUB_ACTOR},env:ci"
 
           HTTP_CODE=$(curl -s -o /tmp/dd_response.txt -w "%{http_code}" \
             -X POST "https://http-intake.logs.${DATADOG_SITE}/api/v2/logs?ddtags=${TAGS}" \
