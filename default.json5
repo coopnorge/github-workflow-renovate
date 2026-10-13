@@ -22,6 +22,7 @@
     "automergeStrategy": "squash",
     "prCreation": "not-pending",
     "prNotPendingHours": 336,
+    "internalChecksAsSuccess": true, // this means that if a PR has stability-days check passing, the PR is created
     "minimumReleaseAge": "14 days",
     "rebaseWhen": "conflicted",
     "postUpdateOptions": [
