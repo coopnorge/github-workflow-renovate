@@ -233,6 +233,13 @@ jobs:
                   printf '%s\n' \
                     "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_TOKEN=${{ steps.gcp-auth.outputs.access_token }}" \
                     >> "$GITHUB_ENV"
+                  
+                  if [ "$SUFFIX" = "DOCKER" ]; then
+                    {
+                      echo "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_USERNAME=oauth2accesstoken"
+                      echo "RENOVATE_${PREFIX}_${REGION}__${SUFFIX}_PKG_DEV_PASSWORD=${{ steps.gcp-auth.outputs.access_token }}"
+                    } >> "$GITHUB_ENV"
+                  fi
 
                 done
             done
