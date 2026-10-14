@@ -1,5 +1,34 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "customManagers": [
+        {
+            // Pin internal coopnorge workflows/actions: @vX and @vX.Y.Z are tracked against github-tags.
+            // Floating refs such as @v0 are read as 0.0.0 by semver-coerced versioning, so they are pinned to the latest exact tag.
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^\\.github/(workflows|actions)/.+\\.ya?ml$/",
+            ],
+            "matchStrings": [
+                "uses:\\s*(?<depName>coopnorge/[^/@\\s]+)(?<path>/[^@\\s]*)?@(?<currentValue>v\\d[^\\s]*)",
+            ],
+            "datasourceTemplate": "github-tags",
+            "versioningTemplate": "semver-coerced",
+        },
+        {
+            // @main has no version. Treat it as v0 so it is pinned to the latest exact tag, keeping the path.
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^\\.github/(workflows|actions)/.+\\.ya?ml$/",
+            ],
+            "matchStrings": [
+                "uses:\\s*(?<prefix>(?<depName>coopnorge/[^/@\\s]+)[^@\\s]*)@main",
+            ],
+            "currentValueTemplate": "v0",
+            "datasourceTemplate": "github-tags",
+            "versioningTemplate": "semver-coerced",
+            "autoReplaceStringTemplate": "uses: {{{prefix}}}@{{{newValue}}}",
+        },
+    ],
     "packageRules": [
         {
             "matchManagers": [
@@ -9,6 +38,12 @@
             "matchPackageNames": [
                 "!coopnorge/**",
             ],
+        },
+        {
+            "description": "Internal coopnorge refs are handled by the custom regex managers",
+            "matchManagers": ["github-actions"],
+            "matchPackageNames": ["coopnorge/**"],
+            "enabled": false,
         },
         {
             "description": "No update cooldown for internal coopnorge actions and releases",
