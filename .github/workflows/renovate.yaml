@@ -74,6 +74,9 @@ env:
   ENGINEERING_PYPI_REGISTRY_URL: europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple
   ENGINEERING_PYPI_WORKLOAD_IDENTITY_PROVIDER: projects/943318002566/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
   ENGINEERING_PYPI_GCP_SERVICE_ACCOUNT: github-actions@engineering-production-af50.iam.gserviceaccount.com
+  DATA_PLATFORM_PYPI_REGISTRY_URL: europe-north1-python.pkg.dev/dp-artifactreg-production-225f/engineering-pypi/simple
+  DATA_PLATFORM_PYPI_WORKLOAD_IDENTITY_PROVIDER: projects/166467127377/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
+  DATA_PLATFORM_PYPI_GCP_SERVICE_ACCOUNT: github-actions-sa@dp-artifactreg-production-225f.iam.gserviceaccount.com
   # This is the dir renovate provides -- if we set our own directory via cacheDir, we can run into permissions issues.
   # It is also possible to cache a higher level of the directory, but it has minimal benefit. While renovate execution
   # time gets faster, it also takes longer to upload the cache as it grows bigger.
@@ -158,13 +161,13 @@ jobs:
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY_PEM }}
           owner: ${{ env.GITHUB_ORG }}
 
-      - name: Authenticate with GCP for Engineering pypi
+      - name: Authenticate with GCP for Data Platform pypi
         id: gcp-auth-pypi
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           token_format: access_token
-          workload_identity_provider: ${{ env.ENGINEERING_PYPI_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.ENGINEERING_PYPI_GCP_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ env.DATA_PLATFORM_PYPI_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DATA_PLATFORM_PYPI_GCP_SERVICE_ACCOUNT }}
           create_credentials_file: false
         continue-on-error: true
 
@@ -175,7 +178,7 @@ jobs:
             "RENOVATE_PYPI_EUROPE__NORTH1__PYTHON_PKG_DEV_TOKEN=${{ steps.gcp-auth-pypi.outputs.access_token }}" \
             >> "$GITHUB_ENV"
           # The env var UV_INDEX is explicitly added to RENOVATE_CUSTOM_ENV_VARIABLES in a later step
-          UV_INDEX="https://oauth2accesstoken:${{ steps.gcp-auth-pypi.outputs.access_token }}@${{ env.ENGINEERING_PYPI_REGISTRY_URL }}/"
+          UV_INDEX="https://oauth2accesstoken:${{ steps.gcp-auth-pypi.outputs.access_token }}@${{ env.DATA_PLATFORM_PYPI_REGISTRY_URL }}/"
           printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV"
 
       - name: Resolve GCP auth settings
