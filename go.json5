@@ -1,36 +1,5 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "customManagers": [
-        {
-            // Track coopnorge/mage version in GitHub Actions workflow files so it is grouped with the go.mod update.
-            // Floating refs such as @v0 are read as 0.0.0 by semver-coerced versioning, so they are pinned to the latest exact tag.
-            "customType": "regex",
-            "managerFilePatterns": [
-                "/^\\.github/(workflows|actions)/.+\\.yaml$/",
-            ],
-            "matchStrings": [
-                "coopnorge/mage/[^@]+@(?<currentValue>v[^\\s\\n]+)",
-            ],
-            "depNameTemplate": "coopnorge/mage",
-            "datasourceTemplate": "github-tags",
-            "versioningTemplate": "semver-coerced",
-        },
-        {
-            // @main has no version. Treat it as v0 so it is pinned to the latest exact tag, keeping the workflow path.
-            "customType": "regex",
-            "managerFilePatterns": [
-                "/^\\.github/(workflows|actions)/.+\\.yaml$/",
-            ],
-            "matchStrings": [
-                "(?<prefix>coopnorge/mage/[^@\\s]+)@main",
-            ],
-            "currentValueTemplate": "v0",
-            "depNameTemplate": "coopnorge/mage",
-            "datasourceTemplate": "github-tags",
-            "versioningTemplate": "semver-coerced",
-            "autoReplaceStringTemplate": "{{{prefix}}}@{{{newValue}}}",
-        },
-    ],
     "packageRules": [
         {
             "description": "No update cooldown for internal coopnorge modules",
