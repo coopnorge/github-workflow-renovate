@@ -71,9 +71,6 @@ env:
   RENOVATE_APP_CLIENT_ID: Iv1.88c3ccbe8bdd86af
   GITHUB_ORG: coopnorge
   SELF_REPO: coopnorge/github-workflow-renovate
-  ENGINEERING_PYPI_REGISTRY_URL: europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple
-  ENGINEERING_PYPI_WORKLOAD_IDENTITY_PROVIDER: projects/943318002566/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
-  ENGINEERING_PYPI_GCP_SERVICE_ACCOUNT: github-actions@engineering-production-af50.iam.gserviceaccount.com
   DATA_PLATFORM_PYPI_REGISTRY_URL: europe-north1-python.pkg.dev/dp-artifactreg-production-225f/data-platform-pypi/simple
   DATA_PLATFORM_PYPI_WORKLOAD_IDENTITY_PROVIDER: projects/166467127377/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
   DATA_PLATFORM_PYPI_GCP_SERVICE_ACCOUNT: gh-actions-reader-sa@dp-artifactreg-production-225f.iam.gserviceaccount.com
