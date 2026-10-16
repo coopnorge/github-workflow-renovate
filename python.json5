@@ -67,6 +67,8 @@
       "matchRegistryUrls": [
         "https://europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple/",
         "https://europe-north1-python.pkg.dev/engineering-production-af50/engineering-pypi/simple",
+        "https://europe-north1-python.pkg.dev/dp-artifactreg-production-225f/data-platform-pypi/simple/",
+        "https://europe-north1-python.pkg.dev/dp-artifactreg-production-225f/data-platform-pypi/simple",
       ],
     },
   ]
