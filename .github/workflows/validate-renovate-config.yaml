@@ -1,0 +1,71 @@
+name: Validate Renovate config
+on:
+  workflow_call:
+    inputs:
+      config-paths:
+        type: string
+        required: false
+        description: |
+          Newline-separated list of Renovate config file paths to watch and validate.
+          Defaults to common consumer repo locations.
+        default: |
+          .github/renovate.json5
+          renovate.json5
+          renovate.json
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      renovate-config: ${{ steps.changes.outputs.renovate-config }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Resolve trigger paths
+        id: resolve-paths
+        env:
+          CONFIG_PATHS: ${{ inputs.config-paths }}
+        run: |
+          {
+            echo "paths<<EOF"
+            echo "renovate-config:"
+            while IFS= read -r path; do
+              [ -n "$path" ] && echo "  - '$path'"
+            done <<< "$CONFIG_PATHS"
+            echo "  - '.github/workflows/validate-renovate-config.yaml'"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
+        id: changes
+        with:
+          filters: ${{ steps.resolve-paths.outputs.paths }}
+
+  validate-renovate-config:
+    name: Validate Renovate config
+    needs: setup
+    if: needs.setup.outputs.renovate-config == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate Renovate config
+        env:
+          CONFIG_PATHS: ${{ inputs.config-paths }}
+        run: |
+          FILES=""
+          while IFS= read -r path; do
+            [ -n "$path" ] && FILES="$FILES $path"
+          done <<< "$CONFIG_PATHS"
+          # Expand globs and filter to existing files
+          EXISTING_FILES=""
+          for f in $FILES; do
+            [ -f "$f" ] && EXISTING_FILES="$EXISTING_FILES $f"
+          done
+          docker run --rm \
+            -v "${{ github.workspace }}:/usr/src/app" \
+            ghcr.io/renovatebot/renovate:43.191.2 \
+            renovate-config-validator $EXISTING_FILES
