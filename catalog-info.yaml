@@ -6,7 +6,7 @@ metadata:
   title: Renovate Bot
   description: Reusable GitHub workflow for renovate bot
   annotations:
-    github.com/project-slug: coopnorge/renovate
+    github.com/project-slug: coopnorge/github-workflow-renovate
     backstage.io/techdocs-ref: dir:.
   tags:
     - github-workflow
