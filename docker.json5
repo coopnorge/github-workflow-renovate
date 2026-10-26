@@ -24,5 +24,15 @@
             ],
             "commitMessageSuffix": "({{#if newDigest}}{{newDigestShort}}{{else}}{{newValue}}{{/if}})"
         },
+        {
+            "groupName": "coopnorge helm base charts",
+            "groupSlug": "coop-helm-charts",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchPackageNames": [
+                "europe-docker.pkg.dev/helmbasecharts-shared-5ebb/coop-helm-charts/**"
+            ]
+        },
     ],
 }
