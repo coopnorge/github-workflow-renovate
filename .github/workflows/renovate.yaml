@@ -71,7 +71,6 @@ env:
   RENOVATE_APP_CLIENT_ID: Iv1.88c3ccbe8bdd86af
   GITHUB_ORG: coopnorge
   SELF_REPO: coopnorge/github-workflow-renovate
-  DATA_PLATFORM_PYPI_REGISTRY_URL: europe-north1-python.pkg.dev/dp-artifactreg-production-225f/data-platform-pypi/simple
   DATA_PLATFORM_PYPI_WORKLOAD_IDENTITY_PROVIDER: projects/166467127377/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
   DATA_PLATFORM_PYPI_GCP_SERVICE_ACCOUNT: gh-actions-reader-sa@dp-artifactreg-production-225f.iam.gserviceaccount.com
   # This is the dir renovate provides -- if we set our own directory via cacheDir, we can run into permissions issues.
@@ -174,9 +173,11 @@ jobs:
           printf '%s\n' \
             "RENOVATE_PYPI_EUROPE__NORTH1__PYTHON_PKG_DEV_TOKEN=${{ steps.gcp-auth-pypi.outputs.access_token }}" \
             >> "$GITHUB_ENV"
-          # The env var UV_INDEX is explicitly added to RENOVATE_CUSTOM_ENV_VARIABLES in a later step
-          UV_INDEX="https://oauth2accesstoken:${{ steps.gcp-auth-pypi.outputs.access_token }}@${{ env.DATA_PLATFORM_PYPI_REGISTRY_URL }}/"
-          printf '%s\n' "UV_INDEX=$UV_INDEX" >> "$GITHUB_ENV"
+          # Both vars are explicitly added to RENOVATE_CUSTOM_ENV_VARIABLES in a later step.
+          printf '%s\n' \
+            "UV_INDEX_DATA_PLATFORM_PYPI_USERNAME=oauth2accesstoken" \
+            "UV_INDEX_DATA_PLATFORM_PYPI_PASSWORD=${{ steps.gcp-auth-pypi.outputs.access_token }}" \
+            >> "$GITHUB_ENV"
 
       - name: Resolve GCP auth settings
         id: gcp-auth-config
@@ -360,9 +361,12 @@ jobs:
             done <<< "$POST_UPGRADE_ENV_VARS"
           fi
 
-          # Add UV_INDEX to post-upgrade
-          if [[ -n "$UV_INDEX" ]]; then
-            JSON_OBJ=$(echo "$JSON_OBJ" | jq -c --arg v "$UV_INDEX" '.UV_INDEX = $v')
+          # Add uv index credentials to post-upgrade
+          if [[ -n "$UV_INDEX_DATA_PLATFORM_PYPI_PASSWORD" ]]; then
+            JSON_OBJ=$(echo "$JSON_OBJ" | jq -c \
+              --arg u "$UV_INDEX_DATA_PLATFORM_PYPI_USERNAME" \
+              --arg p "$UV_INDEX_DATA_PLATFORM_PYPI_PASSWORD" \
+              '.UV_INDEX_DATA_PLATFORM_PYPI_USERNAME = $u | .UV_INDEX_DATA_PLATFORM_PYPI_PASSWORD = $p')
           fi
 
           if [[ "$JSON_OBJ" != "{}" ]]; then
