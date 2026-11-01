@@ -1,0 +1,36 @@
+name: Flutter Renovate
+
+# Callers provide .github/renovate.cjs and retain their own triggers.
+# The administrator config handles RENOVATE_TEST_REF for SHA-pinned previews.
+on:
+  workflow_call:
+    inputs:
+      log-level:
+        description: Renovate log level.
+        required: false
+        default: info
+        type: string
+      dry-run:
+        description: Preview updates without changing remote branches or PRs.
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  renovate:
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      issues: write
+    uses: ./.github/workflows/renovate.yaml
+    secrets: inherit
+    with:
+      config-file: .github/renovate.cjs
+      log-level: ${{ inputs.log-level }}
+      # Preserve administrator force settings instead of the boolean default.
+      extra-env-vars: |
+        RENOVATE_FORCE={}
+        ${{ inputs.dry-run && 'RENOVATE_DRY_RUN=full' || '' }}
+        ${{ inputs.dry-run && format('RENOVATE_TEST_REF={0}', github.sha) || '' }}
+      renovate-cache: ${{ inputs.dry-run && 'disabled' || 'enabled' }}
