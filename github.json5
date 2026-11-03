@@ -28,6 +28,20 @@
             "versioningTemplate": "semver-coerced",
             "autoReplaceStringTemplate": "uses: {{{prefix}}}@{{{newValue}}}",
         },
+        {
+            // Track the main branch of internal coopnorge workflows/actions pinned to a SHA: `@<sha> # main`.
+            // The SHA is bumped to the latest commit on main and the `# main` comment is kept.
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^\\.github/(workflows|actions)/.+\\.ya?ml$/",
+            ],
+            "matchStrings": [
+                "uses:\\s*(?<depName>coopnorge/[^/@\\s]+)(?<path>/[^@\\s]*)?@(?<currentDigest>[a-f0-9]{40})\\s+#\\s+(?<currentValue>main)\\b",
+            ],
+            "datasourceTemplate": "github-digest",
+            "versioningTemplate": "git",
+            "autoReplaceStringTemplate": "uses: {{{depName}}}{{{path}}}@{{{newDigest}}} # {{{newValue}}}",
+        },
     ],
     "packageRules": [
         {
@@ -47,7 +61,7 @@
         },
         {
             "description": "No update cooldown for internal coopnorge actions and releases",
-            "matchDatasources": ["github-tags", "github-releases"],
+            "matchDatasources": ["github-tags", "github-releases", "github-digest"],
             "matchPackageNames": ["coopnorge/**"],
             "minimumReleaseAge": null, // 0 days
             "prCreation": "immediate"
