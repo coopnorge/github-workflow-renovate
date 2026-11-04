@@ -30,7 +30,11 @@
         },
         {
             // Track the main branch of internal coopnorge workflows/actions pinned to a SHA: `@<sha> # main`.
-            // The SHA is bumped to the latest commit on main and the `# main` comment is kept.
+            // The SHA is bumped to the latest commit on main, and the `# main` comment is kept.
+            //
+            // Don't add an autoReplaceStringTemplate here. Custom capture groups such as `path`
+            // aren't available in the template, so the workflow path can end up being dropped from the result.
+            // The default replacement only swaps the digest and leaves the rest of the line alone.
             "customType": "regex",
             "managerFilePatterns": [
                 "/^\\.github/(workflows|actions)/.+\\.ya?ml$/",
@@ -40,7 +44,6 @@
             ],
             "datasourceTemplate": "github-digest",
             "versioningTemplate": "git",
-            "autoReplaceStringTemplate": "uses: {{{depName}}}{{{path}}}@{{{newDigest}}} # {{{newValue}}}",
         },
     ],
     "packageRules": [
