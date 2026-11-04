@@ -376,7 +376,7 @@ jobs:
       - name: Restore renovate cache
         id: cache-restore
         if: inputs.renovate-cache != 'disabled'
-        uses: actions/cache/restore@v6.1.0
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.cache_dir }}
           key: ${{ env.cache_key }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -437,7 +437,7 @@ jobs:
 
       - name: Save renovate cache
         if: inputs.renovate-cache != 'disabled' && steps.cache-restore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6.1.0
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.cache_dir }}
           key: ${{ env.cache_key }}-${{ github.run_id }}-${{ github.run_attempt }}
