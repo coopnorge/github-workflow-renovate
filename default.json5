@@ -16,6 +16,16 @@
         "renovate",
         "{{depName}}"
     ],
+    "semanticCommits": "auto",
+    "semanticCommitType": "chore",
+    "semanticCommitScope": "deps",
+    "packageRules": [
+        {
+            // config:recommended sets type "fix" for dependencies; force "chore" for all
+            "matchPackageNames": ["*"],
+            "semanticCommitType": "chore"
+        }
+    ],
     "prHourlyLimit": 5,
     "prConcurrentLimit": 0,
     "automerge": true,

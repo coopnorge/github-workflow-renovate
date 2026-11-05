@@ -26,6 +26,12 @@ Use the following default configuration in `.github/renovate.json5`:
 }
 ```
 
+Repositories that use conventional commits (detected by Renovate from the commit
+history) get the prefix `chore(deps)` for all dependency updates, including Go
+modules, so they are never treated as fixes. Other repositories keep plain
+commit messages. A repository can force the prefix by setting
+`"semanticCommits": "enabled"` in its own `renovate.json5`.
+
 For more examples, see the following:
 
 - <https://github.com/coopnorge/cloud-projects/blob/main/.github/renovate.json5>
