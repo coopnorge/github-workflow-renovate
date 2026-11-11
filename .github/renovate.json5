@@ -6,9 +6,10 @@
     "customManagers": [
         {
             "customType": "regex",
-            "managerFilePatterns": ["/^\\.github/workflows/renovate\\.yaml$/"],
+            "managerFilePatterns": ["/^\\.github/workflows/.*renovate.*\\.yaml$/"],
             "matchStrings": [
-                "RENOVATE_VERSION:\\s*(?<currentValue>[0-9.]+)"
+                "RENOVATE_VERSION:\\s*(?<currentValue>[0-9.]+)",
+                "ghcr\\.io/renovatebot/renovate:(?<currentValue>[0-9.]+)"
             ],
             "datasourceTemplate": "github-releases",
             "depNameTemplate": "renovatebot/renovate",
