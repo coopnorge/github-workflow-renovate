@@ -69,5 +69,17 @@
             "minimumReleaseAge": null, // 0 days
             "prCreation": "immediate"
         },
+        {
+            // config:recommended adds a "[changelog]({{sourceUrl}}/compare/<old>..<new>)" link for digest updates,
+            // but sourceUrl is empty before this rule. Set it, and also label the diffs as "changes".
+            "description": "Link internal coopnorge digest updates to the commit diff",
+            "matchDatasources": ["github-digest"],
+            "matchPackageNames": ["coopnorge/**"],
+            "matchUpdateTypes": ["digest"],
+            "sourceUrl": "https://github.com/{{{packageName}}}",
+            "prBodyDefinitions": {
+                "Package": "[{{{depName}}}]({{{sourceUrl}}}) ([changes]({{{sourceUrl}}}/compare/{{{currentDigest}}}..{{{newDigest}}}))"
+            },
+        },
     ],
 }
