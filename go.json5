@@ -57,6 +57,9 @@
             ],
         },
         {
+            // The otel modules depend on each other and are released together, so separate PRs conflict.
+            // `**` also matches nested modules such as go.opentelemetry.io/otel/sdk/metric, which `*` doesn't.
+            // tests/scenarios/go-otel-group*.mjs cover this.
             "groupName": "otel-go packages",
             "groupSlug": "otel",
             "matchDatasources": [
@@ -64,7 +67,7 @@
             ],
             "matchPackageNames": [
                 "go.opentelemetry.io/otel",
-                "go.opentelemetry.io/otel/*",
+                "go.opentelemetry.io/otel/**",
             ]
         },
         {
