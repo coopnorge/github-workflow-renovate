@@ -43,9 +43,9 @@
     {
       "matchManagers": ["pep621", "poetry", "pip_requirements"],
       "matchUpdateTypes": ["patch", "minor"],
-      // Exclude dagster and dbt so they aren't bundled in the catch-all
+      // Exclude dagster and dbt so they aren't bundled in the catch-all.
+      // Only negated patterns match every other package.
       "matchPackageNames": [
-        "**",
         "!dagster",
         "!dagster-**",
         "!dbt-**"

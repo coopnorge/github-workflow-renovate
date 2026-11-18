@@ -200,6 +200,72 @@ jobs:
       log-level: ${{ inputs.log-level }}
 ```
 
+## Regression tests
+
+The `tests/` directory has regression tests for the workflow and the presets.
+They run Renovate the way `.github/workflows/renovate.yaml` runs it, against
+test repositories, and check the branches and pull requests Renovate creates. CI
+runs them when a preset, `renovate.yaml` or `tests/` changes.
+
+Each test:
+
+1. Reads `renovate.yaml` to find the Renovate image, the config file and the
+   environment the workflow passes to Renovate.
+2. Creates a repository in a local [Gitea](https://about.gitea.com/) instance,
+   with the files of a scenario in `tests/scenarios/`.
+3. Runs the Renovate image of the workflow with that environment. Gitea replaces
+   GitHub as the platform. Requests to GitHub and package registries return the
+   mock data of the scenario, so the tests run offline, and presets come from
+   local checkout instead of from GitHub.
+4. Runs Renovate again, like the scheduled workflow does, until a run changes
+   nothing. Between runs, a successful CI status is reported on the Renovate
+   branches, so Renovate can auto-merge.
+5. Compares the changed lines on each Renovate branch and the pull request
+   title, state and body with the scenario. Renovate warnings and errors, and
+   requests without mock data, also fail the test.
+
+`renovate-config-validator --strict` also checks the presets.
+
+### Run the tests
+
+```console
+cd tests
+npm ci
+npm test
+```
+
+Useful environment variables:
+
+- `RENOVATE_TEST_SCENARIO=github-internal-main-ref,python-grouping` runs only
+  these scenarios.
+- `RENOVATE_TEST_REF=<commit>` tests `renovate.yaml` and the presets of a commit
+  instead of your working tree, for example to find the change that introduced a
+  regression.
+- `RENOVATE_TEST_KEEP_GITEA=1` keeps Gitea running after the tests, which makes
+  the next run faster. Stop it with
+  `docker compose -f tests/docker-compose.yaml down -v`.
+
+The Renovate logs and the result of each scenario are in `tests/.output/`.
+
+### Add a scenario
+
+Add a file to `tests/scenarios/`. A scenario has:
+
+- `files`: the files of the repository. Without `.github/renovate.json5`, the
+  repository uses the configuration from [Configuration](#configuration).
+- `github`: tags, branches and releases of GitHub repositories, for the
+  `github-tags`, `github-digest` and `github-releases` data sources.
+- `http`: responses for other URLs, such as package registries.
+  `tests/lib/registries.mjs` has helpers to build them.
+- `branches`: the Renovate branches expected at the end, with the changed lines
+  of each file, and the expected pull request.
+- `workflowInputs` (optional): inputs to `renovate.yaml`, such as
+  `extra-env-vars`.
+
+See the existing scenarios for examples. To write the expectations, you can add
+a scenario with `branches: {}`, run it, and check the result in
+`tests/.output/<scenario>/result.json`.
+
 ## References
 
 - <https://docs.renovatebot.com/docker/>
