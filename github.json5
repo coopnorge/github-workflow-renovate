@@ -12,13 +12,12 @@
                 "/^\\.github/(workflows|actions)/.+\\.ya?ml$/",
             ],
             "matchStrings": [
-                "uses:\\s*(?<prefix>(?<depName>coopnorge/[^/@\\s]+)[^@\\s]*)@(?:main|(?<currentValue>v\\d[^\\s]*))",
+                "uses:\\s*(?<depName>coopnorge/[^/@\\s]+)[^@\\s]*@(?:main|(?<currentValue>v\\d[^\\s]*))",
             ],
             "currentValueTemplate": "{{#if currentValue}}{{{currentValue}}}{{else}}v0{{/if}}",
             "datasourceTemplate": "github-tags",
             "versioningTemplate": "semver-coerced",
-            // `prefix` isn't available in the template, so it would render empty and break the rewritten line.
-            // Replace only the ref after the last `@` and keep the rest of the matched text unchanged.
+            // Replaces only the ref after the last `@`.
             "autoReplaceStringTemplate": "{{{replace '[^@]+$' newValue replaceString}}}",
         },
         {
