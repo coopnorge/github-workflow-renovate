@@ -17,7 +17,9 @@
             "currentValueTemplate": "{{#if currentValue}}{{{currentValue}}}{{else}}v0{{/if}}",
             "datasourceTemplate": "github-tags",
             "versioningTemplate": "semver-coerced",
-            "autoReplaceStringTemplate": "uses: {{{prefix}}}@{{{newValue}}}",
+            // `prefix` isn't available in the template, so it would render empty and break the rewritten line.
+            // Replace only the ref after the last `@` and keep the rest of the matched text unchanged.
+            "autoReplaceStringTemplate": "{{{replace '[^@]+$' newValue replaceString}}}",
         },
         {
             // Track the main branch of internal coopnorge workflows/actions pinned to a SHA: `@<sha> # main`.
