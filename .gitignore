@@ -16,3 +16,11 @@
 # Ignore everything in vocabularies, but allow Local
 .vale/styles/config/vocabularies/*
 !.vale/styles/config/vocabularies/Local/
+
+tests/node_modules/
+tests/.output/
+tests/.cache/
+
+# Renovate regression tests
+tests/node_modules/
+tests/.output/

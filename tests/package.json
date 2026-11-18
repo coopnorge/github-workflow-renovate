@@ -1,0 +1,17 @@
+{
+  "name": "github-workflow-renovate-tests",
+  "private": true,
+  "description": "Regression tests for the Renovate workflow and presets in this repository",
+  "type": "module",
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1 --test-reporter=spec workflow.test.mjs renovate.test.mjs",
+    "test:workflow": "node --test --test-reporter=spec workflow.test.mjs"
+  },
+  "devDependencies": {
+    "nock": "14.0.17",
+    "yaml": "^2.9.1"
+  }
+}
