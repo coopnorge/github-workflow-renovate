@@ -12,12 +12,13 @@
                 "/^\\.github/(workflows|actions)/.+\\.ya?ml$/",
             ],
             "matchStrings": [
-                "uses:\\s*(?<prefix>(?<depName>coopnorge/[^/@\\s]+)[^@\\s]*)@(?:main|(?<currentValue>v\\d[^\\s]*))",
+                "uses:\\s*(?<depName>coopnorge/[^/@\\s]+)[^@\\s]*@(?:main|(?<currentValue>v\\d[^\\s]*))",
             ],
             "currentValueTemplate": "{{#if currentValue}}{{{currentValue}}}{{else}}v0{{/if}}",
             "datasourceTemplate": "github-tags",
             "versioningTemplate": "semver-coerced",
-            "autoReplaceStringTemplate": "uses: {{{prefix}}}@{{{newValue}}}",
+            // Replaces only the ref after the last `@`.
+            "autoReplaceStringTemplate": "{{{replace '[^@]+$' newValue replaceString}}}",
         },
         {
             // Track the main branch of internal coopnorge workflows/actions pinned to a SHA: `@<sha> # main`.
