@@ -291,6 +291,16 @@ export async function runRenovate({ gitea, workflow, repository, scenario, files
   const volume = `renovate-test-${scenario.name}`;
   if (runIndex === 1) await execFile('docker', ['volume', 'rm', '-f', volume]);
 
+  // Offline vulnerability database: one `<ecosystem>.nedb` file of OSV records
+  // (one JSON object per line) per ecosystem in the scenario's `osv`.
+  await mkdir(join(inputDir, 'osv'));
+  for (const [ecosystem, advisories] of Object.entries(scenario.osv ?? {})) {
+    await writeFile(
+      join(inputDir, 'osv', `${ecosystem.toLowerCase()}.nedb`),
+      advisories.map((advisory) => `${JSON.stringify(advisory)}\n`).join(''),
+    );
+  }
+
   await writeFile(join(inputDir, 'mock.json'), JSON.stringify({
     presets,
     repos: scenario.github ?? {},
@@ -322,8 +332,9 @@ export async function runRenovate({ gitea, workflow, repository, scenario, files
     // Without platform automerge, Renovate always merges itself: the same result.
     RENOVATE_PLATFORM_AUTOMERGE: 'false',
     // osvVulnerabilityAlerts downloads a vulnerability database from github.com.
-    // Use the empty local database instead: the tests run offline.
+    // Use the advisories of the scenario instead: the tests run offline.
     OSV_OFFLINE_DISABLE_DOWNLOAD: 'true',
+    OSV_OFFLINE_ROOT_DIR: '/renovate-test-input/osv',
     LOG_LEVEL: 'debug',
     LOG_FORMAT: 'json',
     FORCE_COLOR: '3',
