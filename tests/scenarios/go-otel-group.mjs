@@ -11,11 +11,12 @@ const modules = [
   'go.opentelemetry.io/otel/trace',
 ];
 
-// #344: the go.opentelemetry.io/otel modules are released together and depend on
-// each other, so separate PRs conflict. All of them, including nested modules such
-// as otel/sdk/metric, are updated in one PR.
+// The go.opentelemetry.io/otel modules are released together and depend on each
+// other, so separate PRs conflict (#344). config:recommended's group:monorepos
+// groups every module whose source is github.com/open-telemetry/opentelemetry-go,
+// including nested modules such as otel/sdk/metric, without a custom group.
 export default {
-  description: 'groups all go.opentelemetry.io/otel modules into one PR',
+  description: 'groups all go.opentelemetry.io/otel modules into one PR with the monorepo preset',
   github: {
     'open-telemetry/opentelemetry-go': {
       tags: [
@@ -39,7 +40,7 @@ export default {
     `,
   },
   branches: {
-    'renovate/otel': {
+    'renovate/opentelemetry-go-monorepo': {
       changes: {
         'go.mod': [
           '-\tgo.opentelemetry.io/otel v1.46.0',
@@ -54,7 +55,7 @@ export default {
           '+\tgo.opentelemetry.io/otel/trace v1.47.0',
         ],
       },
-      pr: { title: 'chore(deps): update otel-go packages to v1.47.0', state: 'merged' },
+      pr: { title: 'chore(deps): update opentelemetry-go monorepo to v1.47.0', state: 'merged' },
     },
   },
 };

@@ -4,12 +4,12 @@ import { goproxy } from '../lib/registries.mjs';
 const old = daysAgo(120);
 const recent = daysAgo(60);
 
-// #344: only go.opentelemetry.io/otel and its submodules are in the otel group.
+// The opentelemetry-go monorepo group only has modules from that repository.
 // Modules that are versioned and released separately, even under the same
-// go.opentelemetry.io domain, and unrelated modules stay out of it. contrib is
-// grouped by Renovate's own opentelemetry-go-contrib monorepo preset.
+// go.opentelemetry.io domain, and unrelated modules stay out of it. contrib has
+// its own opentelemetry-go-contrib monorepo group.
 export default {
-  description: 'keeps other go modules out of the otel group',
+  description: 'keeps other go modules out of the opentelemetry-go monorepo group',
   github: {
     'open-telemetry/opentelemetry-go': {
       tags: [{ name: 'v1.47.0', sha: sha('otel-v1.47.0'), date: recent }],
@@ -52,7 +52,7 @@ export default {
     `,
   },
   branches: {
-    'renovate/otel': {
+    'renovate/opentelemetry-go-monorepo': {
       changes: {
         'go.mod': [
           '-\tgo.opentelemetry.io/otel v1.46.0',
