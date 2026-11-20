@@ -62,13 +62,14 @@ const isAllowed = (host) => allowedHosts.has(String(host).replace(/:\d+$/, ''));
 nock.disableNetConnect();
 nock.enableNetConnect(isAllowed);
 
-// `http`: { 'https://host/path?query': body | { status, headers, body } }
-for (const [url, response] of Object.entries(mock.http ?? {})) {
+// `http`: { '[METHOD ]https://host/path?query': body | { status, headers, body } }, METHOD defaults to GET
+for (const [key, response] of Object.entries(mock.http ?? {})) {
+  const [, method = 'GET', url] = key.match(/^(?:([A-Z]+) )?(.+)$/);
   const { origin, pathname, search } = new URL(url);
   const isFull = response !== null && typeof response === 'object' && 'body' in response;
   const { status = 200, headers = {}, body } = isFull ? response : { body: response };
   const contentType = typeof body === 'string' ? 'text/plain' : 'application/json';
-  nock(origin).persist().get(pathname + search)
+  nock(origin).persist().intercept(pathname + search, method)
     .reply(status, typeof body === 'string' ? body : JSON.stringify(body), { 'content-type': contentType, ...headers });
 }
 
