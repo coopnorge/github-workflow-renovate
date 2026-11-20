@@ -258,11 +258,11 @@ Add a file to `tests/scenarios/`. A scenario has:
 - `http`: responses for other URLs, such as package registries.
   `tests/lib/registries/` has helpers to build them, with one file per
   ecosystem: `docker.mjs` (Docker Hub), `go.mjs` (Go releases and the Go module
-  proxy) and `python.mjs` (PyPI). Requests use `GET`, unless
-  the URL starts with another method, such as `HEAD https://...`.
+  proxy) and `python.mjs` (PyPI). Requests use `GET`, unless the URL starts with
+  another method, such as `HEAD https://...`.
 - `osv` (optional): vulnerability advisories per ecosystem, for
-  `osvVulnerabilityAlerts`. `tests/lib/registries/osv.mjs` has a helper to
-  build them.
+  `osvVulnerabilityAlerts`. `tests/lib/registries/osv.mjs` has a helper to build
+  them.
 - `branches`: the Renovate branches expected at the end, with the changed lines
   of each file, and the expected pull request.
 - `workflowInputs` (optional): inputs to `renovate.yaml`, such as
