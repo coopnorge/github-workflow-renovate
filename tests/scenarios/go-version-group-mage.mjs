@@ -1,5 +1,6 @@
 import { daysAgo, dedent, sha } from '../lib/harness.mjs';
-import { dockerHubImage, golangReleases, imageDigest } from '../lib/registries.mjs';
+import { dockerHubImage, imageDigest } from '../lib/registries/docker.mjs';
+import { golangReleases } from '../lib/registries/go.mjs';
 
 const released = { '1.27.3': daysAgo(60), '1.27.4': daysAgo(30) };
 const setupGo = sha('setup-go-v7.0.0');

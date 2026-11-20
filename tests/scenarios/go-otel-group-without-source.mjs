@@ -1,5 +1,5 @@
 import { daysAgo, dedent } from '../lib/harness.mjs';
-import { goproxy } from '../lib/registries.mjs';
+import { goproxy } from '../lib/registries/go.mjs';
 
 const versions = { 'v1.46.0': daysAgo(120), 'v1.47.0': daysAgo(60) };
 const source = { importRoot: 'go.opentelemetry.io/otel', repo: 'open-telemetry/opentelemetry-go' };
