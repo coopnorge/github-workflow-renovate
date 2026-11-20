@@ -3,12 +3,11 @@ import { dockerHubImage, golangReleases, imageDigest } from '../lib/registries.m
 
 const released = { '1.27.2': daysAgo(60), '1.27.3': daysAgo(30) };
 
-// A new Go version updates the go directive in go.mod (go.json5 bumps it) and the
-// golang image in Dockerfiles. They are separate PRs. Builds use
-// GOTOOLCHAIN=local, so if the go.mod PR is merged first, it requires a newer Go
-// than the image has, and the build fails.
+// The go directive in go.mod and the golang image in Dockerfiles are updated
+// in one PR. Builds use GOTOOLCHAIN=local, so updating go.mod on its own would
+// require a newer Go than the image has, and the build would fail.
 export default {
-  description: 'updates the go directive and the golang image in separate PRs',
+  description: 'updates the go directive and the golang image in one PR',
   github: {
     'golang/go': {
       tags: Object.entries(released).map(([version, date]) => ({ name: `go${version}`, sha: sha(`go${version}`), date })),
@@ -33,20 +32,15 @@ export default {
     `,
   },
   branches: {
-    'renovate/go-1.x': {
+    'renovate/go-version': {
       changes: {
         'go.mod': ['-go 1.27.2', '+go 1.27.3'],
-      },
-      pr: { title: 'chore(deps): update go module directive to v1.27.3', state: 'merged' },
-    },
-    'renovate/golang-1.x': {
-      changes: {
         Dockerfile: [
           `-FROM golang:1.27.2@${imageDigest('golang:1.27.2')} AS build`,
           `+FROM golang:1.27.3@${imageDigest('golang:1.27.3')} AS build`,
         ],
       },
-      pr: { title: 'chore(deps): update golang docker tag to v1.27.3', state: 'merged' },
+      pr: { title: 'chore(deps): update go version to v1.27.3', state: 'merged' },
     },
   },
 };
