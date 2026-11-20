@@ -256,11 +256,12 @@ Add a file to `tests/scenarios/`. A scenario has:
 - `github`: tags, branches and releases of GitHub repositories, for the
   `github-tags`, `github-digest` and `github-releases` data sources.
 - `http`: responses for other URLs, such as package registries.
-  `tests/lib/registries.mjs` has helpers to build them, for example for PyPI,
-  the Go module proxy, Go releases and Docker Hub. Requests use `GET`, unless
-  the URL starts with another method, such as `HEAD https://...`.
+  `tests/lib/registries/` has helpers to build them, with one file per
+  ecosystem: `docker.mjs` (Docker Hub), `go.mjs` (Go releases and the Go module
+  proxy) and `python.mjs` (PyPI). Requests use `GET`, unless the URL starts with
+  another method, such as `HEAD https://...`.
 - `osv` (optional): vulnerability advisories per ecosystem, for
-  `osvVulnerabilityAlerts`. `tests/lib/registries.mjs` has a helper to build
+  `osvVulnerabilityAlerts`. `tests/lib/registries/osv.mjs` has a helper to build
   them.
 - `branches`: the Renovate branches expected at the end, with the changed lines
   of each file, and the expected pull request.

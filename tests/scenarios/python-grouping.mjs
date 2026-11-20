@@ -1,5 +1,5 @@
 import { daysAgo, dedent, sha } from '../lib/harness.mjs';
-import { pypi } from '../lib/registries.mjs';
+import { pypi } from '../lib/registries/python.mjs';
 
 // python.json5: non-major updates are grouped into one PR, dagster and dbt
 // packages get their own group, and major updates are not automerged.

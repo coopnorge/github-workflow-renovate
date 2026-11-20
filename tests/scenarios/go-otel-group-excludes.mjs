@@ -1,5 +1,5 @@
 import { daysAgo, dedent, sha } from '../lib/harness.mjs';
-import { goproxy } from '../lib/registries.mjs';
+import { goproxy } from '../lib/registries/go.mjs';
 
 const old = daysAgo(120);
 const recent = daysAgo(60);
