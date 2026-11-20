@@ -1,4 +1,65 @@
 // Builders for the `http` mocks of package registries, used by scenarios.
+import { createHash } from 'node:crypto';
+
+/** Deterministic fake image digest (`sha256:...`), so expectations can refer to it by label. */
+export function imageDigest(label) {
+  return `sha256:${createHash('sha256').update(label).digest('hex')}`;
+}
+
+/**
+ * Go release history, as used by Renovate's golang-version datasource (the
+ * `go` directive in go.mod). Like go.dev, it only has the release day.
+ *
+ * @param {Record<string, string>} versions version (`1.27.3`) -> release time (ISO timestamp)
+ */
+export function golangReleases(versions) {
+  const releases = Object.entries(versions).reverse().map(([version, date]) => {
+    const [year, month, day] = date.slice(0, 10).split('-').map(Number);
+    return `\t{\n\t\tDate: Date{${year}, ${month}, ${day}}, Version: Version{${version.split('.').join(', ')}},\n\t},`;
+  });
+  return {
+    'https://raw.githubusercontent.com/golang/website/HEAD/internal/history/release.go':
+      `package history\n\nvar Releases = []*Release{\n${releases.join('\n')}\n}\n`,
+  };
+}
+
+/**
+ * Docker Hub responses for an official image (`library/<image>`), as used by
+ * Renovate's docker datasource. Docker Hub dates a tag by when it was last
+ * pushed, not by when the version was released. Every tag is a multi-arch image,
+ * so Renovate takes the new digest from the Docker Hub tag list.
+ *
+ * @param {string} image image name, such as `golang`
+ * @param {Record<string, { pushed: string, digest: string }>} tags tag -> last
+ *   push time (ISO timestamp) and digest of the image index
+ */
+export function dockerHubImage(image, tags) {
+  const repository = `library/${image}`;
+  const registry = `https://index.docker.io/v2/${repository}`;
+  const results = Object.entries(tags)
+    .map(([name, { pushed, digest }], index) => ({
+      id: index + 1,
+      name,
+      last_updated: pushed,
+      tag_last_pushed: pushed,
+      digest,
+      images: [{ architecture: 'amd64', digest: imageDigest(`${image}:${name}/amd64`) }],
+    }))
+    .sort((a, b) => b.last_updated.localeCompare(a.last_updated));
+  return {
+    'https://index.docker.io/v2/': {},
+    [`https://hub.docker.com/v2/repositories/${repository}/tags?page_size=1000&ordering=last_updated`]:
+      { count: results.length, next: null, results },
+    ...Object.fromEntries(Object.entries(tags).flatMap(([name, { digest }]) => [
+      [`HEAD ${registry}/manifests/${digest}`, {
+        headers: { 'content-type': 'application/vnd.oci.image.index.v1+json', 'docker-content-digest': digest },
+        body: '',
+      }],
+      // No image labels, so no source repository and no release notes.
+      [`${registry}/manifests/${name}`, { status: 404, body: { errors: [{ code: 'MANIFEST_UNKNOWN' }] } }],
+    ])),
+  };
+}
 
 /**
  * Go module proxy (proxy.golang.org) responses for `module`, as used by
