@@ -4,18 +4,16 @@ import { dockerHubImage, golangReleases, imageDigest } from '../lib/registries.m
 const released = { '1.27.3': daysAgo(60), '1.27.4': daysAgo(30) };
 const setupGo = sha('setup-go-v7.0.0');
 
-// coopnorge/mage, with go 1.27.4 released. A go directive bump in mage forces
-// every library and service that uses mage to require that Go version too.
+// coopnorge/mage with Go 1.27.4 released. The files and the Renovate config
+// below are trimmed copies from coopnorge/mage.
 //
-// The go directive in the root go.mod is bumped in its own PR, by the
-// `rangeStrategy: bump` rule for the go directive in go.json5. The golang tooling
-// image deeper in the repo (internal/devtool/tools.Dockerfile, written as
-// `docker.io/library/golang`) and the setup-mage action are updated in another
-// PR, grouped by mage's own rule below.
-//
-// The files and the Renovate config below are trimmed copies from coopnorge/mage.
+// mage refers to the golang image as `docker.io/library/golang`. The go
+// version group in go.json5 only matches `golang`, so the image is updated in
+// mage's own "Go and Golangci-lint versions" group, together with the Go
+// version of the setup-mage action. The go directive in go.mod is updated in a
+// separate PR.
 export default {
-  description: 'updates the go directive of coopnorge/mage and its golang tooling image in separate PRs',
+  description: 'keeps the go directive of coopnorge/mage out of its golang tooling image PR',
   github: {
     'golang/go': {
       tags: Object.entries(released).map(([version, date]) => ({ name: `go${version}`, sha: sha(`go${version}`), date })),
@@ -89,7 +87,7 @@ export default {
     `,
   },
   branches: {
-    'renovate/go-1.x': {
+    'renovate/go-version': {
       changes: {
         'go.mod': ['-go 1.27.3', '+go 1.27.4'],
       },

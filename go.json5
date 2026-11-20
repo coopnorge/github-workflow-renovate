@@ -63,5 +63,21 @@
             "matchDepTypes": ["golang"],
             "rangeStrategy": "bump",
         },
+        {
+            "description": "Group the go directive in go.mod with the golang Docker image so go.mod never requires a newer Go than the image provides",
+            "groupName": "go version",
+            "groupSlug": "go-version",
+            "matchDatasources": [
+                "golang-version", // go directive in go.mod
+                "docker", // golang image in Dockerfiles
+            ],
+            "matchDepNames": [
+                "go",
+                "golang",
+            ],
+            // With the default "strict", an update still within minimumReleaseAge is left out of the group, so go.mod
+            // could be updated without the image. "none" keeps it in, so the PR waits until both updates are old enough.
+            "internalChecksFilter": "none",
+        },
     ]
 }

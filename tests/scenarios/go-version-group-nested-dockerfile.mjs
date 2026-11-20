@@ -3,10 +3,11 @@ import { dockerHubImage, golangReleases, imageDigest } from '../lib/registries.m
 
 const released = { '1.27.3': daysAgo(60), '1.27.4': daysAgo(30) };
 
-// A golang image written as `golang:...` in a subdirectory, such as a tooling
-// image, and the go directive in the root go.mod are updated in separate PRs.
+// The go version group in go.json5 applies to the whole repository: a golang
+// image in a subdirectory, such as a tooling image, is updated in the same PR
+// as the go directive in the root go.mod.
 export default {
-  description: 'updates a nested golang tooling image and the root go directive in separate PRs',
+  description: 'groups a nested golang tooling image with the root go directive',
   github: {
     'golang/go': {
       tags: Object.entries(released).map(([version, date]) => ({ name: `go${version}`, sha: sha(`go${version}`), date })),
@@ -30,20 +31,15 @@ export default {
     `,
   },
   branches: {
-    'renovate/go-1.x': {
+    'renovate/go-version': {
       changes: {
         'go.mod': ['-go 1.27.3', '+go 1.27.4'],
-      },
-      pr: { title: 'chore(deps): update go module directive to v1.27.4', state: 'merged' },
-    },
-    'renovate/golang-1.x': {
-      changes: {
         'internal/devtool/tools.Dockerfile': [
           `-FROM golang:1.27.3@${imageDigest('golang:1.27.3')} AS golang`,
           `+FROM golang:1.27.4@${imageDigest('golang:1.27.4')} AS golang`,
         ],
       },
-      pr: { title: 'chore(deps): update golang docker tag to v1.27.4', state: 'merged' },
+      pr: { title: 'chore(deps): update go version to v1.27.4', state: 'merged' },
     },
   },
 };
